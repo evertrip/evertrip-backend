@@ -1,11 +1,11 @@
-#default ????
+#default 공통사항
 spring:
   jpa:
     hibernate:
       ddl-auto: create
     properties:
       hibernate:
-        #        show_sql: true ?????? ?? ??
+        #        show_sql: true 시스템아웃을 통해 찍음
         format_sql: true
         jdbc:
           batch_size: 200
@@ -14,25 +14,25 @@ spring:
       initialize-schema: always
     job:
       enabled: false
-## ?? ?? ?? ??
+## 순환 참조 에러 제거
   main:
     allow-circular-references: true
-## Mysql ?? ??
+## Mysql 상세 지정
     database: mysql
-## Mysql ?? ??
+## Mysql 기본 설정
   datasource:
     url: ENC(RIpV0YFORoSuop3LAHk9XHU30RDsQ9lNyazeZ7A/Zmyqz69EEf3nsTsD3HiGZrhyUH1u775eCdmwQlSTbM31ulDiVl29DbaKW/7LFg28G43nHP8ODQijSdp4WynYq0Cr)
     username: ENC(JHya4zdkPrjKceTY2xkHYw==)
     password: ENC(EgXQEVAqfj6qieIHR8xelfP2mHdacrh4)
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  ## ?? ?? ??
+## 파일 크기 지정
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
 
-  ## redis ??
+## redis 설정
   data:
     redis:
       host: localhost
@@ -56,13 +56,13 @@ logging:
     org:
       springframework:
         security: DEBUG
---- # local ??
+--- # local 환경
 spring:
   config:
     activate:
       on-profile: local
 
-  # Oauth ??
+# Oauth 설정
   security:
     oauth2:
       naver:
@@ -88,13 +88,13 @@ decorator:
     p6spy:
       enable-logging: true
 
---- # prod ??
+--- # prod 환경
 spring:
   config:
     activate:
       on-profile: prod
 
-  # Oauth ??
+# Oauth 설정
   security:
     oauth2:
       naver:
