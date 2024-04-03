@@ -1,6 +1,8 @@
 #default ????
 spring:
   jpa:
+    hibernate:
+      ddl-auto: create
     properties:
       hibernate:
         #        show_sql: true ?????? ?? ??
@@ -19,9 +21,9 @@ spring:
     database: mysql
 ## Mysql ?? ??
   datasource:
-    url:
-    username:
-    password:
+    url: ENC(RIpV0YFORoSuop3LAHk9XHU30RDsQ9lNyazeZ7A/Zmyqz69EEf3nsTsD3HiGZrhyUH1u775eCdmwQlSTbM31ulDiVl29DbaKW/7LFg28G43nHP8ODQijSdp4WynYq0Cr)
+    username: ENC(JHya4zdkPrjKceTY2xkHYw==)
+    password: ENC(EgXQEVAqfj6qieIHR8xelfP2mHdacrh4)
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   ## ?? ?? ??
@@ -77,7 +79,7 @@ spring:
 
 
 jwt:
-  secret: ENC(bFw/rS0aB/ppcvo42Xp8Ge0k6LGmBjLcv6dCbNDoEUFH0KWoekU7ph2R0ZN40IrUHnRikMXVHbtFs68mCaOzEs5SaTUYookBlVX6rBo38mYrccD/xRvUgZfT/PHa8XKRPJdylznzelPL7tJSdwaT+lQpEmV8HGDTHtkUVBLSVdYBqa62gpnVtg==)
+  secret: ENC(NMYQFZTvflq8xLXcPokP9JbX2L/7XjXTYZi20YO1vDWTZ2fWzAw3HT14dunizBFUwf9Qe37Hb2EmaGkhGHiTRR/qWYTJP/btvbZhqLyENd4Fgny33FwMMiXXidtvRVx2y6CMvlj3zAXiBrJ5kaSj9X4mxokd7H6WsxPTWoNGyC5vwPW4dVmFnA==)
   token-validity-in-seconds: 2592000  # 60 * 60 * 24 * 30 30? -> ?
   refresh-token-validity-in-seconds: 2592000 # 60 * 60 * 24 * 30 30? -> ?
 ## p6spy query logging
@@ -109,6 +111,6 @@ spring:
 
 
 jwt:
-  secret: ENC(bFw/rS0aB/ppcvo42Xp8Ge0k6LGmBjLcv6dCbNDoEUFH0KWoekU7ph2R0ZN40IrUHnRikMXVHbtFs68mCaOzEs5SaTUYookBlVX6rBo38mYrccD/xRvUgZfT/PHa8XKRPJdylznzelPL7tJSdwaT+lQpEmV8HGDTHtkUVBLSVdYBqa62gpnVtg==)
+  secret: ENC(NMYQFZTvflq8xLXcPokP9JbX2L/7XjXTYZi20YO1vDWTZ2fWzAw3HT14dunizBFUwf9Qe37Hb2EmaGkhGHiTRR/qWYTJP/btvbZhqLyENd4Fgny33FwMMiXXidtvRVx2y6CMvlj3zAXiBrJ5kaSj9X4mxokd7H6WsxPTWoNGyC5vwPW4dVmFnA==)
   token-validity-in-seconds: 900  # 60 * 15 15? -> ?
   refresh-token-validity-in-seconds: 2592000 #1209600 # 60 * 60 * 24 * 30 30? -> ?
