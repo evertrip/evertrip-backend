@@ -16,7 +16,12 @@ public enum ErrorCode {
     INVALID_ENUM_VALUE(HttpStatus.BAD_REQUEST, "Invalid enum value"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
 
-    CRYPT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Crypt error");
+    CRYPT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Crypt error"),
+
+    // TOKEN
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"User Authentication is failed"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "RefreshToken is invalid");
 
     private HttpStatus status;
     private String message;
