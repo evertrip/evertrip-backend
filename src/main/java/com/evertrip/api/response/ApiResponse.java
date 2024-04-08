@@ -1,7 +1,9 @@
 package com.evertrip.api.response;
 
 import com.evertrip.api.exception.ErrorResponse;
+import lombok.Getter;
 
+@Getter
 public class ApiResponse<T> {
 
     private final boolean success;

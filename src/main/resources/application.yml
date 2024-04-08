@@ -57,7 +57,7 @@ logging:
         security: DEBUG
 ## 대칭키 암호화 설정(개인정보 암호화 시 사용)
 symmetricCrypto:
-  secret: ENC(bpfwl0aKfqa6SjzH6EaPzb4L5Q8weHnPc6Q+X94/mS26faFJlrtJ6TJiOFCUjIac4s6Zk9MQTig=)
+  secret: ENC(kyj221KeDRO2F0MOiV3FJfgRzctOgpptDy+ZtuqI5iXk6+k0p08dfHHu8kjSwJ6jmF49MNR23EA=)
 --- # local 환경
 spring:
   config:

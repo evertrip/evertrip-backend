@@ -113,14 +113,14 @@ public class OauthService {
 
 
                     log.info("회원 비교 : {}", (member==findMember));
-                    log.info("회원 이메일(실제) : {}" +naverUser.getEmail());
-                    log.info("회원 이메일(DB 암호화) : {}" +findMember.getEmail());
-                    log.info("회원 이메일(DB 복호화) : {}" +symmetricCrypto.decrypt(findMember.getEmail()));
-                    log.info("회원 전화번호(DB 암호화) : {}" +memberDetail.getPhone());
-                    log.info("회원 전화번호(DB 복호화) : {}" +symmetricCrypto.decrypt(memberDetail.getPhone()));
+                    log.info("회원 이메일(실제) : {}",naverUser.getEmail());
+                    log.info("회원 이메일(DB 암호화) : {}" ,findMember.getEmail());
+                    log.info("회원 이메일(DB 복호화) : {}" ,symmetricCrypto.decrypt(findMember.getEmail()));
+                    log.info("회원 전화번호(DB 암호화) : {}" ,memberDetail.getPhone());
+                    log.info("회원 전화번호(DB 복호화) : {}" ,symmetricCrypto.decrypt(memberDetail.getPhone()));
                 }
 
-                log.info("해당 회원 저장 여부 : {}"+memberRepository.findByEmail(symmetricCrypto.encrypt(naverUser.getEmail())).get().getEmail());
+                log.info("해당 회원 저장 여부 : {}",memberRepository.findByEmail(symmetricCrypto.encrypt(naverUser.getEmail())).get().getEmail());
 
                 // JWT 토큰 발급
                 // ----------------------------------------------------------

@@ -1,7 +1,6 @@
 package com.evertrip.oauth.controller;
 
 import com.evertrip.api.response.ApiResponse;
-import com.evertrip.constant.ConstantPool;
 import com.evertrip.constant.ConstantPool.SocialLoginType;
 import com.evertrip.member.dto.response.MemberSimpleResponseDto;
 import com.evertrip.oauth.service.OauthService;
@@ -9,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
