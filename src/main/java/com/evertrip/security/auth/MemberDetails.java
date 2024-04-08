@@ -1,5 +1,6 @@
 package com.evertrip.security.auth;
 
+import com.evertrip.member.entity.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

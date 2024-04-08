@@ -1,5 +1,6 @@
 package com.evertrip.security.auth;
 
+import com.evertrip.member.repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
