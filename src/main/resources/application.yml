@@ -1,8 +1,6 @@
 #default 공통사항
 spring:
   jpa:
-    hibernate:
-      ddl-auto: create
     properties:
       hibernate:
         #        show_sql: true 시스템아웃을 통해 찍음
