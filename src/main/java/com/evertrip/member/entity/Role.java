@@ -17,7 +17,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private RoleName roleName;
 
-    private enum RoleName {
+    public enum RoleName {
         ADMIN("관리자"), USER("일반사용자");
 
         private final String roleName;

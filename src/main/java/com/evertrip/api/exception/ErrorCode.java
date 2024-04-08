@@ -18,6 +18,13 @@ public enum ErrorCode {
 
     CRYPT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Crypt error"),
 
+    // LOGIN
+    INVALID_SOCIAL_LOGIN_TYPE(HttpStatus.BAD_REQUEST, "Unsupported or invalid social login type"),
+
+    // AUTHORITY
+
+    AUTHORITY_NOT_FOUND(HttpStatus.NOT_FOUND, "Authority not founded"),
+
     // TOKEN
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"User Authentication is failed"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),

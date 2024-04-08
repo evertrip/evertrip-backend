@@ -1,6 +1,7 @@
 package com.evertrip.member.entity;
 
 import com.evertrip.common.entity.BaseEntity;
+import com.evertrip.file.common.BasicImage;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,4 +31,16 @@ public class MemberProfile extends BaseEntity {
 
     @Column(name="profile_image")
     private String profileImage;
+
+    public MemberProfile(Member member, String name) {
+        this.member = member;
+        this.nickName = name;
+        this.description = "기본 자기 소개글을 작성해주시기 바랍니다.";
+        this.deletedYn = false;
+        this.profileImage = BasicImage.BASIC_USER_IMAGE.getPath();
+    }
+
+    public void softDelete() {
+        this.deletedYn = true;
+    }
 }

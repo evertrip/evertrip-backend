@@ -3,6 +3,7 @@ package com.evertrip.member.entity;
 import com.evertrip.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,11 +32,19 @@ public class MemberDetail extends BaseEntity {
     @Column(name="age")
     private String age;
 
-    @Column(name="address")
-    private String address;
-
     @Column(name="deleted_yn")
     private boolean deletedYn;
 
+    public MemberDetail(Member member, String name, String phone, String gender, String age) {
+        this.member = member;
+        this.name = name;
+        this.phone = phone;
+        this.gender = gender;
+        this.age = age;
+        this.deletedYn = false;
+    }
 
+    public void softDelete() {
+        this.deletedYn = true;
+    }
 }
