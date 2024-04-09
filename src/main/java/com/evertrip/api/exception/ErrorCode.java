@@ -28,7 +28,13 @@ public enum ErrorCode {
     // TOKEN
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"User Authentication is failed"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),
-    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "RefreshToken is invalid");
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "RefreshToken is invalid"),
+
+    // MEMBER
+    INCORRECT_FORMAT_NICKNAME(HttpStatus.UNPROCESSABLE_ENTITY, "Nickname format is Incorrect"),
+    INCORRECT_FORMAT_DESCRIPTION(HttpStatus.UNPROCESSABLE_ENTITY, "Description format is Incorrect"),
+
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not founded");
 
     private HttpStatus status;
     private String message;

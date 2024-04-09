@@ -2,10 +2,13 @@ package com.evertrip.member.entity;
 
 import com.evertrip.common.entity.BaseEntity;
 import com.evertrip.file.common.BasicImage;
+import com.evertrip.member.dto.request.MemberProfilePatchDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -38,6 +41,13 @@ public class MemberProfile extends BaseEntity {
         this.description = "기본 자기 소개글을 작성해주시기 바랍니다.";
         this.deletedYn = false;
         this.profileImage = BasicImage.BASIC_USER_IMAGE.getPath();
+    }
+
+    public void changProfile(MemberProfilePatchDto dto) {
+        this.profileImage = dto.getProfileImage();
+        this.description = dto.getDescription();
+        this.nickName = dto.getNickName();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void softDelete() {
