@@ -42,9 +42,9 @@ cloud:
   aws:
     credentials:
       accessKey: ENC(LJQxXC6N0RkjpUBlxYngCfxtN0A/TShrtzAiKk/Wekk=)
-      secretKey: ENC(8gJFX7y8rYo+nHSy6+8QEVxxlgjCPWOmQMN0iGoe)
+      secretKey:
     s3:
-      bucket: evertrip-bucket
+      bucket: ever-trip-bucket
     region:
       static: ap-northeast-2
     stack:

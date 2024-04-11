@@ -2,6 +2,13 @@ package com.evertrip.member.service;
 
 import com.evertrip.api.exception.ApplicationException;
 import com.evertrip.api.exception.ErrorCode;
+import com.evertrip.file.common.BasicImage;
+import com.evertrip.file.common.TableName;
+import com.evertrip.file.dto.request.FileRequestDto;
+import com.evertrip.file.dto.response.FileResponseDto;
+import com.evertrip.file.entity.File;
+import com.evertrip.file.entity.FileInfo;
+import com.evertrip.file.service.FileService;
 import com.evertrip.member.dto.request.MemberProfilePatchDto;
 import com.evertrip.member.dto.response.MemberProfileResponseDto;
 import com.evertrip.member.entity.Member;
@@ -67,21 +74,21 @@ public class MemberService {
 
             // 기본이미지 아닐 경우 기존 파일 정보 삭제
             if (!profile.getProfileImage().equals(BasicImage.BASIC_USER_IMAGE.getPath())) {
-                FileRequestDto profileImage = FileRequestDto.create(TableName.MEMBER_PROFILE_INFO, profile.getId());
+                FileRequestDto profileImage = FileRequestDto.create(TableName.MEMBER_PROFILE, profile.getId());
                 FileResponseDto findProfileFile = fileService.findFilesByTableInfo(profileImage, false).get(0);
                 fileService.delete(findProfileFile.getFileId());
             }
 
             // 공통 : 파일 정보 저장
-            fileService.saveFileInfo(new FileInfo(TableName.MEMBER_PROFILE_INFO, profile.getId(), file));
+            fileService.saveFileInfo(new FileInfo(TableName.MEMBER_PROFILE, profile.getId(), file));
             dto.setProfileImage(file.getPath());
 
         } else if (!StringUtils.hasText(dto.getProfileImage())) {
             // 사진을 제거한 상태이기 때문에 기본 이미지로 세팅해주는 작업
             // 기존 파일 정보 제거
-            System.out.println("BasicImage: " + BasicImage.BASIC_USER_IMAGE.getPath());
+            log.info("BasicImage: {}", BasicImage.BASIC_USER_IMAGE.getPath());
             dto.setProfileImage(BasicImage.BASIC_USER_IMAGE.getPath());
-            FileRequestDto profileImage = FileRequestDto.create(TableName.MEMBER_PROFILE_INFO, profile.getId());
+            FileRequestDto profileImage = FileRequestDto.create(TableName.MEMBER_PROFILE, profile.getId());
             List<FileResponseDto> fileList = fileService.findFilesByTableInfo(profileImage, false);
 
             if (fileList.size() > 0) {
@@ -111,15 +118,15 @@ public class MemberService {
 
         // Todo: 회원이 등록한 게시글 및 게시글 관련 정보 삭제
 
+        // Refresh 토큰을 Redis에서 제거하는 작업
         try {
-            // Refresh 토큰을 Redis에서 제거하는 작업
             redisService.removeRefreshToken("refresh:" + hmacAndBase64.crypt(request.getRemoteAddr(), "HmacSHA512") + "_" + memberId);
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeyException e) {
             throw new ApplicationException(ErrorCode.CRYPT_ERROR);
         }
 
         // 회원 프로필 이미지 삭제
-        fileService.deleteFileList(FileRequestDto.create(TableName.MEMBER_PROFILE_INFO, profile.getId()));
+        fileService.deleteFileList(FileRequestDto.create(TableName.MEMBER_PROFILE, profile.getId()));
 
         // TODO: 게시글 관련 파일 삭제
 
