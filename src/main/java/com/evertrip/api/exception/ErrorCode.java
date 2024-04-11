@@ -34,7 +34,14 @@ public enum ErrorCode {
     INCORRECT_FORMAT_NICKNAME(HttpStatus.UNPROCESSABLE_ENTITY, "Nickname format is Incorrect"),
     INCORRECT_FORMAT_DESCRIPTION(HttpStatus.UNPROCESSABLE_ENTITY, "Description format is Incorrect"),
 
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not founded");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not founded"),
+
+    // File
+    INVALID_FILE_TYPE(HttpStatus.FORBIDDEN, "Invalid file type"),
+    FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "File not founded"),
+    FILE_INFO_EXISTS(HttpStatus.CONFLICT, "File Info exists"),
+    MAX_FILE_SIZE_10MB(HttpStatus.BAD_REQUEST, "Max file size 10MB"),
+    FILE_STORAGE_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "File storage failed");
 
     private HttpStatus status;
     private String message;

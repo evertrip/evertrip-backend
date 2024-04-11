@@ -41,8 +41,8 @@ spring:
 cloud:
   aws:
     credentials:
-      accessKey:
-      secretKey:
+      accessKey: ENC(LJQxXC6N0RkjpUBlxYngCfxtN0A/TShrtzAiKk/Wekk=)
+      secretKey: ENC(8gJFX7y8rYo+nHSy6+8QEVxxlgjCPWOmQMN0iGoe)
     s3:
       bucket: evertrip-bucket
     region:
