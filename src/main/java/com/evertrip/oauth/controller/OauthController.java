@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -31,8 +32,7 @@ public class OauthController {
      * 소셜 로그인 요청에 대한 응답 처리(로그인, 회원가입 처리)
      */
     @GetMapping("/auth/{socialLoginType}/callback")
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<MemberSimpleResponseDto> callback(
+    public ResponseEntity callback(
             @PathVariable(name="socialLoginType") String type,
             @RequestParam(name="code") String code,
             HttpServletRequest request) throws IOException {
@@ -41,7 +41,7 @@ public class OauthController {
         HttpHeaders httpHeaders = new HttpHeaders();
         SocialLoginType socialLoginType= SocialLoginType.valueOf(type.toUpperCase());
         Long memberId=Long.parseLong(oauthService.oauthLogin(socialLoginType,code,httpHeaders,request));
-        return ApiResponse.successOf(new MemberSimpleResponseDto(memberId));
+        return new ResponseEntity<>(ApiResponse.successOf(new MemberSimpleResponseDto(memberId)),httpHeaders ,HttpStatus.OK);
     }
 
 }
