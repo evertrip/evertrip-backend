@@ -8,19 +8,24 @@ import com.evertrip.member.entity.Role;
 import com.evertrip.member.repository.MemberProfileRepository;
 import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.member.repository.RoleRepository;
+import com.evertrip.security.redis.RedisService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -44,7 +49,12 @@ class MemberTest {
     @Autowired
     FileRepository fileRepository;
 
-    private static String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzE1NDcyMDE4fQ.sfnp2mG6mhZV7wezNaL1YVvZadMNT8U8mT6wy2FST4-0ZkvQ1xfw2oEE-EbWAgTJQZ7-82HpNs_90RI5gaoYWg";
+    @MockBean
+    RedisService redisService;
+
+    private static String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzE2NjE5MjAyfQ.K1z5xJJsthPZI3BUqSjbs8sa-l7gwaNVAc5NO_CoPtSl-cs18o67J4UpWykqnA-Q0NerEYt9vM7mM1tbzCdcuQ";
+
+    private static String refreshTokenKey = "refresh:SMKUt25uIr6opwVA7FbDyZGEYSQzUILOp3LLtXskm36c90/3sOMVGV0w62ReY3u1MjsKZkgZi0E7kTmks7/joA==_2";
 
     @Autowired
     MockMvc mockMvc;
@@ -184,5 +194,26 @@ class MemberTest {
         assertEquals(profileImage, modifyProfile.getProfileImage());
     }
 
+    @DisplayName("로그아웃 테스트")
+    @Test
+    public void logoutTest() throws Exception {
+        // given
+        // Mock 객체 설정 - redisService 목 객체에 getRefreshToken() 메소드를 호출할 시 Null 값을 반환하도록 설정
+        Mockito.when(redisService.getRefreshToken(anyString())).thenReturn(null);
+
+
+        // when
+        mockMvc.perform(get("/removeToken")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token))
+                .andExpect(status().isOk());
+
+        // then
+        // Mock 객체 호출 확인 - verify를 이용하여 redisService의 removeRefreshToken(refreshTokenKey)가 실제로 호출되었는지 확인합니다.
+        // 실제로는 IP 주소가 계속 바뀌므로 IP 주소는 동일하다는 가정하에 removeRefreshToken이 호출되었는지에 대한 테스트를 진행하였습니다.
+        Mockito.verify(redisService).removeRefreshToken(anyString());
+        // Mock 객체 설정에 의해 Null 값 반환 확인하는 작업입니다.
+        assertNull(null,redisService.getRefreshToken(refreshTokenKey));
+    }
 
 }
