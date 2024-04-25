@@ -36,6 +36,10 @@ public class Member {
         this.deletedYn = false;
     }
 
+    public void changeRole(Role role) {
+        this.role = role;
+    }
+
     public void softDelete() {
         this.deletedYn = true;
     }
