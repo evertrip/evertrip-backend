@@ -132,7 +132,6 @@ public class OauthService {
                 // authenticationToken을 이용해서 Authentication 객체를 생성하려고 authentication 메소드가 실행이 될 때
                 // CustomUserDetailsService의 loadUserByUsername 메소드가 실행된다.
                 Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 // createToken 메소드를 통해서 JWT Token 생성
                 String jwt = tokenProvider.createToken(authentication);

@@ -95,4 +95,16 @@ public class MemberController {
         // Todo: Access Token은 요청을 보낸 Axios API에서 쿠키를 삭제하도록 지시한다.
         return new ResponseEntity(ApiResponse.successOf(new MemberSimpleResponseDto(memberId)), HttpStatus.OK);
     }
+
+    @GetMapping("/admin/test1")
+    public ResponseEntity test1(Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        return new ResponseEntity(ApiResponse.successOf(memberId), HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/test2")
+    public ResponseEntity test2(Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        return new ResponseEntity(ApiResponse.successOf(memberId), HttpStatus.OK);
+    }
 }

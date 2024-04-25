@@ -1,10 +1,14 @@
 package com.evertrip.security.auth;
 
 import com.evertrip.member.entity.Member;
+import com.evertrip.member.entity.Role;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class MemberDetails implements UserDetails {
     private Member member;
@@ -21,7 +25,14 @@ public class MemberDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+
+        Role role = member.getRole();
+
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+        authorities.add(new SimpleGrantedAuthority(role.getRoleName().name()));
+
+        return authorities;
     }
 
     @Override
