@@ -103,7 +103,7 @@ class MemberTest {
 
     @DisplayName("회원 프로필 수정 BindingResult 검증 테스트")
     @Test
-    public void modifyMemberProfileTest() throws Exception {
+    public void modifyMemberProfileValidTest() throws Exception {
         // given
         MemberProfilePatchDto inAppropriateNickname = new MemberProfilePatchDto("닉네임","테스트를 위한 프로필 수정입니다. 참고해주시면 감사하겠습니다",1L,null);
         MemberProfilePatchDto inAppropriateDescription = new MemberProfilePatchDto("닉네임테스트","부적절한설명",1L,null);
@@ -128,6 +128,27 @@ class MemberTest {
                         .content(inAppropriateDescriptionJson))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.errorResponse.errorName").value("INCORRECT_FORMAT_DESCRIPTION"));
+
+    }
+
+    @DisplayName("회원 프로필 수정 Invalid fileId 테스트")
+    @Test
+    public void modifyMemberProfileFailTest() throws Exception {
+        // given
+        MemberProfilePatchDto invalidFileInProfile = new MemberProfilePatchDto("수정할닉네임","테스트를 위한 프로필 수정입니다. 참고해주시면 감사하겠습니다",100L,null);
+
+
+        // 요청 메시지 바디에 JSON 형태로 넣어주기 위해 객체 직렬화 합니다.
+        String invalidFileInProfileJson = objectMapper.writeValueAsString(invalidFileInProfile);
+
+        // when & then
+        // 잘못된 형식의 닉네임을 넣어줬을 때 제대로 BindingResult의 유효성 검사를 진행하는지 테스트합니다.
+        mockMvc.perform(patch("/members/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(invalidFileInProfileJson))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errorResponse.errorName").value("FILE_NOT_FOUND"));
 
     }
 
