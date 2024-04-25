@@ -43,4 +43,6 @@ public class Member {
     public void softDelete() {
         this.deletedYn = true;
     }
+
+
 }

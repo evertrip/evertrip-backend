@@ -1,10 +1,14 @@
 package com.evertrip.member.controller;
 
+import com.evertrip.file.common.TableName;
+import com.evertrip.file.dto.request.FileRequestDto;
 import com.evertrip.file.repository.FileRepository;
+import com.evertrip.file.service.FileService;
 import com.evertrip.member.dto.request.MemberProfilePatchDto;
 import com.evertrip.member.dto.response.MemberProfileResponseDto;
 import com.evertrip.member.entity.Member;
 import com.evertrip.member.entity.Role;
+import com.evertrip.member.repository.MemberDetailRepository;
 import com.evertrip.member.repository.MemberProfileRepository;
 import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.member.repository.RoleRepository;
@@ -19,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -41,6 +44,9 @@ class MemberTest {
     MemberProfileRepository memberProfileRepository;
 
     @Autowired
+    MemberDetailRepository memberDetailRepository;
+
+    @Autowired
     RoleRepository roleRepository;
 
     @Autowired
@@ -48,6 +54,9 @@ class MemberTest {
 
     @Autowired
     FileRepository fileRepository;
+
+    @Autowired
+    FileService fileService;
 
     @MockBean
     RedisService redisService;
@@ -213,7 +222,45 @@ class MemberTest {
         // 실제로는 IP 주소가 계속 바뀌므로 IP 주소는 동일하다는 가정하에 removeRefreshToken이 호출되었는지에 대한 테스트를 진행하였습니다.
         Mockito.verify(redisService).removeRefreshToken(anyString());
         // Mock 객체 설정에 의해 Null 값 반환 확인하는 작업입니다.
-        assertNull(null,redisService.getRefreshToken(refreshTokenKey));
+        assertNull(redisService.getRefreshToken(refreshTokenKey));
     }
+
+    @DisplayName("회원 탈퇴 테스트")
+    @Test
+    public void updateMemberDeleteTest() throws Exception {
+        // given
+        // Mock 객체 설정 - redisService 목 객체에 getRefreshToken() 메소드를 호출할 시 Null 값을 반환하도록 설정
+        Mockito.when(redisService.getRefreshToken(anyString())).thenReturn(null);
+
+        Member member = memberRepository.findById(2L).get();
+
+
+        // when
+        mockMvc.perform(delete("/members")
+                        .header("Authorization", token))
+                .andExpect(status().isOk());
+
+        // then
+
+        // 회원, 프로필, 상세에 대해 softDelete 설정 했는지에 대한 테스트
+        Member findMember = memberRepository.findById(member.getId()).get();
+        assertEquals(true,findMember.isDeletedYn());
+        assertEquals(true,memberProfileRepository.findByMemberId(member.getId(),false).isEmpty());
+        assertEquals(true,memberDetailRepository.findByMemberId(member.getId(),false).isEmpty());
+
+        // Redis에 토큰 제거 테스트
+        Mockito.verify(redisService).removeRefreshToken(anyString());
+        assertNull(redisService.getRefreshToken(refreshTokenKey));
+
+        //  회원 프로필 이미지 삭제했는지 확인 테스트
+        assertEquals(true,fileService.findFilesByTableInfo(FileRequestDto.create(TableName.MEMBER_PROFILE, memberProfileRepository.findByMemberId(member.getId(), true).get().getId()), false).isEmpty());
+
+
+        // 회원이 등록한 게시글 및 게시글 관련 정보 삭제 테스트
+
+
+    }
+
+
 
 }
