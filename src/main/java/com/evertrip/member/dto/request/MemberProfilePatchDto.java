@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberProfilePatchDto {
-    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{1,15}$")
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{5,15}$")
     private String nickName;
 
     @Size(min = 20, max = 500)

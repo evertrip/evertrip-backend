@@ -1,16 +1,19 @@
 package com.evertrip.member.controller;
 
+import com.evertrip.member.dto.request.MemberProfilePatchDto;
 import com.evertrip.member.dto.response.MemberProfileResponseDto;
 import com.evertrip.member.entity.Member;
 import com.evertrip.member.entity.Role;
 import com.evertrip.member.repository.MemberProfileRepository;
 import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.member.repository.RoleRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,9 @@ class MemberTest {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzE1NDcyMDE4fQ.sfnp2mG6mhZV7wezNaL1YVvZadMNT8U8mT6wy2FST4-0ZkvQ1xfw2oEE-EbWAgTJQZ7-82HpNs_90RI5gaoYWg";
 
@@ -93,6 +99,36 @@ class MemberTest {
                 .andExpect(jsonPath("$.content[0].createdAt").value(memberProfile.getCreatedAt()))
                 .andExpect(jsonPath("$.content[0].updatedAt").value(memberProfile.getUpdatedAt()))
                 .andExpect(jsonPath("$.content[0].profileImage").value(memberProfile.getProfileImage()));
+    }
+
+    @DisplayName("회원 프로필 수정 BindingResult 검증 테스트")
+    @Test
+    public void modifyMemberProfileTest() throws Exception {
+        // given
+        MemberProfilePatchDto inAppropriateNickname = new MemberProfilePatchDto("닉네임","테스트를 위한 프로필 수정입니다. 참고해주시면 감사하겠습니다",1L,null);
+        MemberProfilePatchDto inAppropriateDescription = new MemberProfilePatchDto("닉네임테스트","부적절한설명",1L,null);
+
+        // 요청 메시지 바디에 JSON 형태로 넣어주기 위해 객체 직렬화 합니다.
+        String inAppropriateNicknameJson = objectMapper.writeValueAsString(inAppropriateNickname);
+        String inAppropriateDescriptionJson = objectMapper.writeValueAsString(inAppropriateDescription);
+
+        // when & then
+        // 잘못된 형식의 닉네임을 넣어줬을 때 제대로 BindingResult의 유효성 검사를 진행하는지 테스트합니다.
+        mockMvc.perform(patch("/members/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(inAppropriateNicknameJson))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.errorResponse.errorName").value("INCORRECT_FORMAT_NICKNAME"));
+
+        // 잘못된 형식의 description을 넣어줬을 때 제대로 BindingResult의 유효성 검사를 진행하는지 테스트합니다.
+        mockMvc.perform(patch("/members/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(inAppropriateDescriptionJson))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.errorResponse.errorName").value("INCORRECT_FORMAT_DESCRIPTION"));
+
     }
 
 
