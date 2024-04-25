@@ -1,5 +1,6 @@
 package com.evertrip.member.controller;
 
+import com.evertrip.file.repository.FileRepository;
 import com.evertrip.member.dto.request.MemberProfilePatchDto;
 import com.evertrip.member.dto.response.MemberProfileResponseDto;
 import com.evertrip.member.entity.Member;
@@ -39,6 +40,9 @@ class MemberTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    FileRepository fileRepository;
 
     private static String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzE1NDcyMDE4fQ.sfnp2mG6mhZV7wezNaL1YVvZadMNT8U8mT6wy2FST4-0ZkvQ1xfw2oEE-EbWAgTJQZ7-82HpNs_90RI5gaoYWg";
 
@@ -105,8 +109,8 @@ class MemberTest {
     @Test
     public void modifyMemberProfileValidTest() throws Exception {
         // given
-        MemberProfilePatchDto inAppropriateNickname = new MemberProfilePatchDto("닉네임","테스트를 위한 프로필 수정입니다. 참고해주시면 감사하겠습니다",1L,null);
-        MemberProfilePatchDto inAppropriateDescription = new MemberProfilePatchDto("닉네임테스트","부적절한설명",1L,null);
+        MemberProfilePatchDto inAppropriateNickname = new MemberProfilePatchDto("닉네임", "테스트를 위한 프로필 수정입니다. 참고해주시면 감사하겠습니다", 1L, null);
+        MemberProfilePatchDto inAppropriateDescription = new MemberProfilePatchDto("닉네임테스트", "부적절한설명", 1L, null);
 
         // 요청 메시지 바디에 JSON 형태로 넣어주기 위해 객체 직렬화 합니다.
         String inAppropriateNicknameJson = objectMapper.writeValueAsString(inAppropriateNickname);
@@ -135,7 +139,7 @@ class MemberTest {
     @Test
     public void modifyMemberProfileFailTest() throws Exception {
         // given
-        MemberProfilePatchDto invalidFileInProfile = new MemberProfilePatchDto("수정할닉네임","테스트를 위한 프로필 수정입니다. 참고해주시면 감사하겠습니다",100L,null);
+        MemberProfilePatchDto invalidFileInProfile = new MemberProfilePatchDto("수정할닉네임", "테스트를 위한 프로필 수정입니다. 참고해주시면 감사하겠습니다", 100L, null);
 
 
         // 요청 메시지 바디에 JSON 형태로 넣어주기 위해 객체 직렬화 합니다.
@@ -150,6 +154,34 @@ class MemberTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.errorResponse.errorName").value("FILE_NOT_FOUND"));
 
+    }
+
+    @DisplayName("회원 프로필 수정 정상 동작 테스트")
+    @Test
+    public void modifyMemberProfileTest() throws Exception {
+        // given
+        MemberProfilePatchDto profile = new MemberProfilePatchDto("수정할닉네임", "테스트를 위한 프로필 수정입니다. 참고해주시면 감사하겠습니다", 1L, null);
+        String profileImage = fileRepository.findById(1L).get().getPath();
+
+        // 요청 메시지 바디에 JSON 형태로 넣어주기 위해 객체 직렬화 합니다.
+        String profileJson = objectMapper.writeValueAsString(profile);
+
+        // when & then
+        // 잘못된 형식의 닉네임을 넣어줬을 때 제대로 BindingResult의 유효성 검사를 진행하는지 테스트합니다.
+        mockMvc.perform(patch("/members/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(profileJson))
+                .andExpect(status().isOk());
+
+        // 변경된 이후의 회원 프로필을 DB에서 뽑아옵니다.
+        MemberProfileResponseDto modifyProfile = memberProfileRepository.findMemberProfiles(2L, false).get(0);
+
+
+        // 비교하기
+        assertEquals(profile.getNickName(), modifyProfile.getNickName());
+        assertEquals(profile.getDescription(), modifyProfile.getDescription());
+        assertEquals(profileImage, modifyProfile.getProfileImage());
     }
 
 
