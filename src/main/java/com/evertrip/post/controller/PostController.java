@@ -10,6 +10,7 @@ import com.evertrip.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -45,10 +46,18 @@ public class PostController {
 
         Long memberId = Long.parseLong(principal.getName());
         ApiResponse<PostSimpleResponseDto> response = postService.createPost(dto, memberId);
-        return ResponseEntity.ok(response);
+        return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
-    
+    /**
+     * 게시글 삭제
+     */
+    @DeleteMapping("/{post-id}")
+    public ResponseEntity<ApiResponse<PostSimpleResponseDto>> deletePost(@PathVariable("post-id") Long postId, Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        ApiResponse<PostSimpleResponseDto> response = postService.deletePost(memberId, postId);
+        return new ResponseEntity(response, HttpStatus.NO_CONTENT);
+    }
 
 
 }

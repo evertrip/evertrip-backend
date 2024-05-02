@@ -46,7 +46,9 @@ public enum ErrorCode {
     // POST
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not founded"),
 
-    INCORRECT_FORMAT_POST(HttpStatus.UNPROCESSABLE_ENTITY, "Post format is Incorrect");
+    INCORRECT_FORMAT_POST(HttpStatus.UNPROCESSABLE_ENTITY, "Post format is Incorrect"),
+
+    NOT_WRITER(HttpStatus.FORBIDDEN, "Not Writer of the Post" );
 
     private HttpStatus status;
     private String message;

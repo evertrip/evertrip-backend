@@ -17,5 +17,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "where p.id = :postId and p.deletedYn = false")
     Optional<PostResponseDto> getPostDetail(@Param("postId") Long postId);
 
+    @Query(value = "select p from Post p where p.id = :postId and p.deletedYn = false")
+    Optional<Post> getPostNotDeleteById(@Param("postId") Long postId);
+
 
 }
