@@ -3,6 +3,7 @@ package com.evertrip.post.entity;
 import com.evertrip.common.entity.BaseEntity;
 import com.evertrip.file.common.BasicImage;
 import com.evertrip.member.entity.Member;
+import com.evertrip.post.dto.request.PostPatchDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -59,6 +60,11 @@ public class Post extends BaseEntity {
     public void deletePost() {
         this.deletedYn = true;
         this.deletedAt =  LocalDateTime.now();
+    }
+
+    public void updatePost(String title,String profileImage) {
+        this.title = title;
+        this.profileImage = profileImage;
     }
 
 }

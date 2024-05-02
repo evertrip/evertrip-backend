@@ -3,6 +3,7 @@ package com.evertrip.post.service;
 import com.evertrip.api.exception.ApplicationException;
 import com.evertrip.api.exception.ErrorCode;
 import com.evertrip.api.response.ApiResponse;
+import com.evertrip.file.common.BasicImage;
 import com.evertrip.file.common.TableName;
 import com.evertrip.file.dto.request.FileRequestDto;
 import com.evertrip.file.entity.File;
@@ -10,6 +11,7 @@ import com.evertrip.file.entity.FileInfo;
 import com.evertrip.file.service.FileService;
 import com.evertrip.member.entity.Member;
 import com.evertrip.member.repository.MemberRepository;
+import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
 import com.evertrip.post.dto.response.PostResponseDto;
 import com.evertrip.post.dto.response.PostSimpleResponseDto;
@@ -20,6 +22,8 @@ import com.evertrip.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 
 @Service
 @RequiredArgsConstructor
@@ -86,6 +90,55 @@ public class PostService {
 
         PostDetail postDetail = postDetailRepository.findByPostId(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         postDetail.deletePostDetail();
+
+        return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
+    }
+
+    public ApiResponse<PostSimpleResponseDto> updatePost(Long memberId, Long postId, PostPatchDto dto) {
+        Post post = postRepository.getPostNotDeleteById(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
+
+        // 해당 게시글 작성자 본인이 아닐 경우 예외 발생
+        if (post.getMember().getId() != memberId) {
+            throw new ApplicationException(ErrorCode.NOT_WRITER);
+        }
+
+        // 게시글 이미지 - fileId 값이 있는 경우
+        if (dto.getFileId() != null) {
+
+            // 게시글 이미지 세팅
+            File file = fileService.findFile(dto.getFileId());
+            fileService.checkFileExtForProfile(file.getFileName());
+
+            // 기본 이미지 아닐 경우 기존 파일 정보 삭제
+            if (!post.getProfileImage().equals(BasicImage.BASIC_POST_IMAGE.getPath())) {
+                FileRequestDto fileDto = FileRequestDto.create(TableName.POST, post.getId());
+                fileService.deleteFileList(fileDto);
+            }
+
+            // 공통 : 파일 정보 저장
+            fileService.saveFileInfo(new FileInfo(TableName.POST, post.getId(), file));
+
+            // 이미지 세팅
+            dto.setProfileImage(file.getPath());
+
+        } else if (!StringUtils.hasText(dto.getProfileImage())) {
+
+            // 이미지를 제거한 상태이기 때문에 기본 이미지로 세팅해주는 작업
+            dto.setProfileImage(BasicImage.BASIC_POST_IMAGE.getPath());
+
+            // 기존 파일 정보 제거
+            FileRequestDto postFile = FileRequestDto.create(TableName.POST, post.getId());
+            fileService.deleteFileList(postFile);
+        }
+
+        // Post 수정
+        post.updatePost(dto.getTitle(), dto.getProfileImage());
+
+        // PostDetail 수정
+        PostDetail postDetail = postDetailRepository.findByPostId(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
+        postDetail.updateContent(dto.getContent());
+
+        // Todo: 태그 관련 수정 (태그 분기 처리)
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }

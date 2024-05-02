@@ -33,4 +33,8 @@ public class PostDetail {
     public void deletePostDetail() {
         this.deletedYn = true;
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

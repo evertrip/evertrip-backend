@@ -3,6 +3,7 @@ package com.evertrip.post.controller;
 import com.evertrip.api.exception.ApplicationException;
 import com.evertrip.api.exception.ErrorCode;
 import com.evertrip.api.response.ApiResponse;
+import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
 import com.evertrip.post.dto.response.PostResponseDto;
 import com.evertrip.post.dto.response.PostSimpleResponseDto;
@@ -40,6 +41,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<ApiResponse<PostSimpleResponseDto>> createPost(@Valid @RequestBody PostRequestDto dto, BindingResult bindingResult, Principal principal) {
 
+        // validation 체크
         if (bindingResult.hasErrors()) {
             throw new ApplicationException(ErrorCode.INCORRECT_FORMAT_POST);
         }
@@ -57,6 +59,21 @@ public class PostController {
         Long memberId = Long.parseLong(principal.getName());
         ApiResponse<PostSimpleResponseDto> response = postService.deletePost(memberId, postId);
         return new ResponseEntity(response, HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping("/{post-id}")
+    public ResponseEntity<ApiResponse<PostSimpleResponseDto>> updatePost(@PathVariable("post-id") Long postId,
+                                                                         @Valid @RequestBody PostPatchDto postPatchDto,
+                                                                         BindingResult bindingResult,
+                                                                         Principal principal) {
+        // validation 체크
+        if (bindingResult.hasErrors()) {
+            throw new ApplicationException(ErrorCode.INCORRECT_FORMAT_POST);
+        }
+
+        Long memberId = Long.parseLong(principal.getName());
+        ApiResponse<PostSimpleResponseDto> response = postService.updatePost(memberId, postId, postPatchDto);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
 
