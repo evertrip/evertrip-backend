@@ -3,6 +3,7 @@ package com.evertrip.post.service;
 import com.evertrip.api.exception.ApplicationException;
 import com.evertrip.api.exception.ErrorCode;
 import com.evertrip.api.response.ApiResponse;
+import com.evertrip.constant.ConstantPool;
 import com.evertrip.file.common.BasicImage;
 import com.evertrip.file.common.TableName;
 import com.evertrip.file.dto.request.FileRequestDto;
@@ -20,6 +21,7 @@ import com.evertrip.post.entity.PostDetail;
 import com.evertrip.post.repository.PostDetailRepository;
 import com.evertrip.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -49,6 +51,19 @@ public class PostService {
 
         PostResponseDto postDetail = postRepository.getPostDetail(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         return ApiResponse.successOf(postDetail);
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = ConstantPool.CacheName.POST, key = "#postId")
+    public PostResponseDto getPostDetailV2(Long postId) {
+        // Todo: 레디스에 해당 post가 존재할 시 레디스 정보를 넘겨주고 없을 시 실제 DB 조회 후 레디스에 저장
+
+        // Todo: 레디스에 해당 post를 보는 member pk 리스트 저장
+
+        // Todo: 레디스에 해당 post의 조회수를 +1 증가 시키는 작업
+
+        PostResponseDto postDetail = postRepository.getPostDetail(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
+        return postDetail;
     }
 
     public ApiResponse<PostSimpleResponseDto> createPost(PostRequestDto dto, Long memberId) {

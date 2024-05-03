@@ -36,6 +36,15 @@ public class PostController {
     }
 
     /**
+     * 게시글 단일 조회 (캐싱 적용)
+     */
+    @GetMapping("/v2/{post-id}")
+    public ResponseEntity<ApiResponse<PostResponseDto>> getPostDetailV2(@PathVariable("post-id") Long postId) {
+        PostResponseDto postDetail = postService.getPostDetailV2(postId);
+        return ResponseEntity.ok(ApiResponse.successOf(postDetail));
+    }
+
+    /**
      * 게시글 생성
      */
     @PostMapping
