@@ -36,7 +36,7 @@ public class Post extends BaseEntity {
     @Column(name="deleted_yn")
     private Boolean deletedYn;
 
-    @Column(name="profile_image")
+    @Column(name="post_image")
     private String profileImage;
 
     @Column(name="deleted_at")
@@ -47,6 +47,8 @@ public class Post extends BaseEntity {
         this.title = title;
         this.deletedYn = false;
         this.profileImage = BasicImage.BASIC_POST_IMAGE.getPath();
+        this.likeCount = 0L;
+        this.view = 0L;
     }
 
     public Post(Member member, String title, String profileImage) {
@@ -54,6 +56,8 @@ public class Post extends BaseEntity {
         this.title = title;
         this.deletedYn = false;
         this.profileImage = profileImage;
+        this.likeCount = 0L;
+        this.view = 0L;
     }
 
 

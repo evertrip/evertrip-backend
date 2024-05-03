@@ -41,6 +41,12 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public ApiResponse<PostResponseDto> getPostDetail(Long postId) {
+        // Todo: 레디스에 해당 post가 존재할 시 레디스 정보를 넘겨주고 없을 시 실제 DB 조회 후 레디스에 저장
+
+        // Todo: 레디스에 해당 post를 보는 member pk 리스트 저장
+
+        // Todo: 레디스에 해당 post의 조회수를 +1 증가 시키는 작업
+
         PostResponseDto postDetail = postRepository.getPostDetail(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         return ApiResponse.successOf(postDetail);
     }
@@ -67,6 +73,8 @@ public class PostService {
 
         // Todo: TagsId 여부에 따른 분기 처리
 
+        // Todo: 레디스에 해당 post 정보 저장해주기
+
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }
@@ -81,6 +89,8 @@ public class PostService {
         }
 
         // TODO: 게시글 관련 엔티티 삭제 처리(좋아요, 태그, 게시글 로그, 댓글, 파일)
+
+        // TODO: 레디스에 해당 게시글 관련 정보 삭제
 
         // 파일 정보 삭제
         fileService.deleteFileList(FileRequestDto.create(TableName.POST, post.getId()));
@@ -139,6 +149,8 @@ public class PostService {
         postDetail.updateContent(dto.getContent());
 
         // Todo: 태그 관련 수정 (태그 분기 처리)
+
+        // Todo: 레디스에 해당 post 수정사항 적용
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }

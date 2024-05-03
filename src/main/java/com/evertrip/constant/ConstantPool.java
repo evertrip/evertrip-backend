@@ -23,6 +23,16 @@ public class ConstantPool {
     //  FILE SCHEDULING DURATION
     public static final Integer FILE_EXPIRATION_DURATION = 30*6;
 
+
+    // SPRING CACHING
+    public class CacheName {
+
+        public static final String POST = "post";
+
+        public static final String VIEWS = "views";
+    }
+
+
     // 소셜 로그인 타입
     public enum SocialLoginType {
         GOOGLE,
