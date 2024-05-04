@@ -19,6 +19,7 @@ import com.evertrip.security.jwt.RefreshTokenProvider;
 import com.evertrip.security.jwt.SymmetricCrypto;
 import com.evertrip.security.jwt.TokenProvider;
 import com.evertrip.security.redis.RedisService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -83,7 +84,7 @@ public class OauthService {
     }
 
     @Transactional
-    public String oauthLogin(ConstantPool.SocialLoginType socialLoginType, String code, HttpHeaders httpHeaders , HttpServletRequest request) throws IOException {
+    public void oauthLogin(ConstantPool.SocialLoginType socialLoginType, String code, HttpHeaders httpHeaders , HttpServletRequest request) throws IOException {
         switch (socialLoginType) {
             case NAVER -> {
                 // 네이버로 일회성 코드를 보내 액세스 토큰이 담긴 응답객체를 받아온다
@@ -136,8 +137,17 @@ public class OauthService {
                 String jwt = tokenProvider.createToken(authentication);
                 String refresh = refreshTokenProvider.createToken(authentication, ipAddress);
 
-                httpHeaders.add(AUTHORIZATION_HEADER, "Bearer " + jwt);
-                httpHeaders.add(REFRESH_HEADER, "Bearer " + refresh);
+                Cookie jwtCookie = new Cookie(AUTHORIZATION_HEADER,  jwt);
+                jwtCookie.setHttpOnly(true);
+                jwtCookie.setSecure(true);
+                jwtCookie.setPath("/");
+                response.addCookie(jwtCookie);
+
+                Cookie refreshCookie = new Cookie(REFRESH_HEADER,  refresh);
+                refreshCookie.setHttpOnly(true);
+                refreshCookie.setSecure(true);
+                refreshCookie.setPath("/");
+                response.addCookie(refreshCookie);
 
                 // REDIS에 Refresh Token 저장
                 try {
@@ -149,7 +159,6 @@ public class OauthService {
                 }
                 // ----------------------------------------------------------
 
-                return authentication.getName();
 
             }
             default -> {
