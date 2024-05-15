@@ -32,6 +32,14 @@ public class ConstantPool {
         public static final String VIEWS = "views";
     }
 
+    // POST_EVENT_TYPE
+    public enum EventType {
+        VIEWER,
+        SCROLL,
+        STAYING,
+        HISTORY
+    }
+
 
     // 소셜 로그인 타입
     public enum SocialLoginType {
