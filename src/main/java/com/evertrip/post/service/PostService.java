@@ -21,6 +21,7 @@ import com.evertrip.post.entity.PostDetail;
 import com.evertrip.post.repository.PostDetailRepository;
 import com.evertrip.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import org.springframework.util.StringUtils;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PostService {
 
     private final MemberRepository memberRepository;
@@ -41,21 +43,27 @@ public class PostService {
 
     private final PostDetailRepository postDetailRepository;
 
-    @Transactional(readOnly = true)
-    public ApiResponse<PostResponseDto> getPostDetail(Long postId) {
-        // Todo: 레디스에 해당 post가 존재할 시 레디스 정보를 넘겨주고 없을 시 실제 DB 조회 후 레디스에 저장
+    private final RedisForSetService redisForSetService;
 
-        // Todo: 레디스에 해당 post를 보는 member pk 리스트 저장
+    public ApiResponse<PostResponseDto> getPostDetailV1(Long postId, Long memberId) {
 
-        // Todo: 레디스에 해당 post의 조회수를 +1 증가 시키는 작업
+        // 해당 게시글 조회 시 레디스에 게시글 조회 명단 확인
+        if (!redisForSetService.isMember(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString())) {
+            // 게시글 조회 명단에 없을 시 명단에 추가해주고 post 엔티티 조회 후 조회수 1 증가 시키기
+            redisForSetService.addToset(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString());
 
+            Post post = postRepository.getPostNotDeleteById(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
+            post.plusView();
+        }
+
+        // PostDetail 조회 해오기
         PostResponseDto postDetail = postRepository.getPostDetail(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         return ApiResponse.successOf(postDetail);
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = ConstantPool.CacheName.POST, key = "#postId")
-    public PostResponseDto getPostDetailV2(Long postId) {
+    public PostResponseDto getPostDetailV2(Long postId, Long memberId) {
         // Todo: 레디스에 해당 post가 존재할 시 레디스 정보를 넘겨주고 없을 시 실제 DB 조회 후 레디스에 저장
 
         // Todo: 레디스에 해당 post를 보는 member pk 리스트 저장

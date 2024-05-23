@@ -33,6 +33,8 @@ public class ConstantPool {
         public static final String POST = "post";
 
         public static final String VIEWS = "views";
+
+        public static final String VIEWERS = "viewers";
     }
 
     // POST_EVENT_TYPE

@@ -22,10 +22,10 @@ public class BatchScheduler {
     @Autowired
     private Job sqsBatchJob;
 
-    @Scheduled(cron = "0 */15 * * * ?")  // 매 15분마다 실행
-    public void runBatchJob() throws JobExecutionException {
-        log.info("SQS 스케줄링 동작");
-        jobLauncher.run(sqsBatchJob, new JobParametersBuilder()
-                .addLong("uniqueness", System.nanoTime()).toJobParameters());
-    }
+//    @Scheduled(cron = "0 */15 * * * ?")  // 매 15분마다 실행
+//    public void runBatchJob() throws JobExecutionException {
+//        log.info("SQS 스케줄링 동작");
+//        jobLauncher.run(sqsBatchJob, new JobParametersBuilder()
+//                .addLong("uniqueness", System.nanoTime()).toJobParameters());
+//    }
 }

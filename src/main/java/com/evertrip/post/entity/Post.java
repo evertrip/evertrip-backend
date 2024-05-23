@@ -71,4 +71,8 @@ public class Post extends BaseEntity {
         this.profileImage = profileImage;
     }
 
+    public void plusView() {
+        this.view += 1;
+    }
+
 }
