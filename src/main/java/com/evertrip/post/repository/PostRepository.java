@@ -20,5 +20,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "select p from Post p where p.id = :postId and p.deletedYn = false")
     Optional<Post> getPostNotDeleteById(@Param("postId") Long postId);
 
+    @Query(value = "select p.view from Post p where p.id = :postId and p.deletedYn = false")
+    Optional<Long> getViews(@Param("postId") Long postId);
+
 
 }

@@ -22,7 +22,8 @@ import com.evertrip.post.repository.PostDetailRepository;
 import com.evertrip.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -45,11 +46,15 @@ public class PostService {
 
     private final RedisForSetService redisForSetService;
 
+    private final CacheManager cacheManager;
+
+    private final PostCacheService postCacheService;
+
     public ApiResponse<PostResponseDto> getPostDetailV1(Long postId, Long memberId) {
 
-        // 해당 게시글 조회 시 레디스에 게시글 조회 명단 확인
+        // 해당 게시글 조회 시 레디스에 게시글 방문자 명단 확인
         if (!redisForSetService.isMember(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString())) {
-            // 게시글 조회 명단에 없을 시 명단에 추가해주고 post 엔티티 조회 후 조회수 1 증가 시키기
+            // 게시글 방문자 명단에 없을 시 해당 사용자를 명단에 추가해주고 post 엔티티 조회 후 조회수 1 증가 시키기
             redisForSetService.addToset(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString());
 
             Post post = postRepository.getPostNotDeleteById(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
@@ -61,16 +66,26 @@ public class PostService {
         return ApiResponse.successOf(postDetail);
     }
 
-    @Transactional(readOnly = true)
-    @Cacheable(value = ConstantPool.CacheName.POST, key = "#postId")
     public PostResponseDto getPostDetailV2(Long postId, Long memberId) {
-        // Todo: 레디스에 해당 post가 존재할 시 레디스 정보를 넘겨주고 없을 시 실제 DB 조회 후 레디스에 저장
+        // 레디스에 해당 post가 존재할 시 레디스 정보를 넘겨주고 없을 시 실제 DB 조회 후 레디스에 저장
+        PostResponseDto postDetail = postCacheService.getPostDetailUsingCachable(postId);
 
-        // Todo: 레디스에 해당 post를 보는 member pk 리스트 저장
+        // 조회수(제일 최신)는 Redis에서 조회해서 postDetail의 조회수에 넣어줍니다.
+        Long views = postCacheService.getViews(postId).longValue();
 
-        // Todo: 레디스에 해당 post의 조회수를 +1 증가 시키는 작업
+        // 방문자 리스트에 해당 사용자가 존재하지 않을 시 방문자 리스트에 추가해주고 조회수 1 증가 시켜주기
+        if (!redisForSetService.isMember(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString())) {
+            // Redis에 방문자 명단 추가
+            redisForSetService.addToset(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString());
 
-        PostResponseDto postDetail = postRepository.getPostDetail(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
+            // 수동으로 cacheManager를 통해 redis에 조회수 +1 증가 시켜주기
+            String viewsCacheKey = postId.toString();
+            Cache viewsCache = cacheManager.getCache(ConstantPool.CacheName.VIEWS);
+            viewsCache.put(viewsCacheKey, views+1);
+
+            views = views+1;
+        }
+        postDetail.setView(views);
         return postDetail;
     }
 
