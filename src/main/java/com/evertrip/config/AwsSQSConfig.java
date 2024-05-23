@@ -3,6 +3,7 @@ package com.evertrip.config;
 import com.evertrip.sqs.converter.TextPlainJsonMessageConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import io.awspring.cloud.sqs.listener.ListenerMode;
 import io.awspring.cloud.sqs.listener.acknowledgement.AcknowledgementOrdering;
 import io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMode;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
@@ -59,6 +60,8 @@ public class AwsSQSConfig {
         return SqsMessageListenerContainerFactory
                 .builder()
                 .configure(options -> options
+                        .maxMessagesPerPoll(10)
+                        .listenerMode(ListenerMode.BATCH)
                         .acknowledgementMode(AcknowledgementMode.ALWAYS)
                         .acknowledgementInterval(Duration.ofSeconds(3))
                         .acknowledgementThreshold(5)
@@ -69,10 +72,12 @@ public class AwsSQSConfig {
                 .build();
     }
 
-    // 메시지 발송을 위한 SQS 템플릿 설정 (Sender 쪽)
+    // 메시지 수신을 받기 위한 SqsTemplate 빈 생성
     @Bean
     public SqsTemplate sqsTemplate() {
-        return SqsTemplate.newTemplate(sqsAsyncClient());
+        return SqsTemplate.builder().sqsAsyncClient(sqsAsyncClient())
+                .messageConverter(sqsMessagingMessageConverter(objectMapper)).build();
+
     }
 
     @Bean

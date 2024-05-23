@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.AbstractMessageConverter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.MimeType;
 
 import java.io.IOException;
@@ -16,7 +17,6 @@ public class TextPlainJsonMessageConverter extends AbstractMessageConverter {
     private ObjectMapper objectMapper;
 
     public TextPlainJsonMessageConverter(ObjectMapper objectMapper) {
-        super(new MimeType("text", "plain", Charset.forName("UTF-8")));
         this.objectMapper = objectMapper;
     }
 
