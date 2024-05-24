@@ -6,6 +6,7 @@ import com.evertrip.api.response.ApiResponse;
 import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
 import com.evertrip.post.dto.response.PostResponseDto;
+import com.evertrip.post.dto.response.PostResponseForMainDto;
 import com.evertrip.post.dto.response.PostSimpleResponseDto;
 import com.evertrip.post.service.PostService;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,6 +44,14 @@ public class PostController {
     public ResponseEntity<ApiResponse<PostResponseDto>> getPostDetailV2(@PathVariable("post-id") Long postId) {
         PostResponseDto postDetail = postService.getPostDetailV2(postId);
         return ResponseEntity.ok(ApiResponse.successOf(postDetail));
+    }
+
+
+    @GetMapping("/permit/best30")
+    public ResponseEntity<ApiResponse<List<PostResponseForMainDto>>> getPostBest30() {
+        System.out.println("요청들어옴");
+        ApiResponse<List<PostResponseForMainDto>> response = ApiResponse.successOf(postService.getPostBest30());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**

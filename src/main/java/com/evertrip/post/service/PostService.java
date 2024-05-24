@@ -15,6 +15,7 @@ import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
 import com.evertrip.post.dto.response.PostResponseDto;
+import com.evertrip.post.dto.response.PostResponseForMainDto;
 import com.evertrip.post.dto.response.PostSimpleResponseDto;
 import com.evertrip.post.entity.Post;
 import com.evertrip.post.entity.PostDetail;
@@ -25,6 +26,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -171,4 +175,7 @@ public class PostService {
     }
 
 
+    public List<PostResponseForMainDto> getPostBest30() {
+        return postRepository.findTop30Posts();
+    }
 }

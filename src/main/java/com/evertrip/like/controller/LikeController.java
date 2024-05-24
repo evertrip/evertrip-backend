@@ -16,20 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/like")
 @RequiredArgsConstructor
 public class LikeController {
     private final LikeService likeService;
 
     /*단일 글에 대해서 좋아요 한 사람들의 member_id */
-    @GetMapping("/permit/like/members/{postId}")  // URL 경로 변수 수정
+    @GetMapping("/permit/members/{postId}")  // URL 경로 변수 수정
     public ResponseEntity<ApiResponse<LikeMembersResponseDto>> getLikeMembers(@PathVariable Long postId){
         ApiResponse<LikeMembersResponseDto> response = ApiResponse.successOf(likeService.getLikeMembers(postId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /*단일 글에 대해서 좋아요 한 사람들의 수*/
-    @GetMapping("permit/like/count/{postId}")
+    @GetMapping("/permit/count/{postId}")
     public ResponseEntity<ApiResponse<LikeCountResponseDto>> getLikeCount(@PathVariable Long postId){
         ApiResponse<LikeCountResponseDto> response = ApiResponse.successOf(likeService.getLikeCount(postId));
         return new ResponseEntity<>(response, HttpStatus.OK);

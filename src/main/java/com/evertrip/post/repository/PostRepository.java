@@ -1,11 +1,13 @@
 package com.evertrip.post.repository;
 
 import com.evertrip.post.dto.response.PostResponseDto;
+import com.evertrip.post.dto.response.PostResponseForMainDto;
 import com.evertrip.post.entity.Post;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -20,5 +22,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "select p from Post p where p.id = :postId and p.deletedYn = false")
     Optional<Post> getPostNotDeleteById(@Param("postId") Long postId);
 
+
+    @Query("SELECT new com.evertrip.post.dto.response.PostResponseForMainDto(p.id, p.member.id, mp.nickName, p.title, p.createdAt, p.view, p.profileImage, pd.content, p.likeCount) " +
+            "FROM Post p " +
+            "JOIN MemberProfile mp ON p.member.id = mp.id " +
+            "JOIN PostDetail pd ON p.id = pd.post.id " +
+            "ORDER BY p.likeCount DESC")
+    List<PostResponseForMainDto> findTop30Posts();
 
 }
