@@ -69,7 +69,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<PostSimpleResponseDto>> deletePost(@PathVariable("post-id") Long postId, Principal principal) {
         Long memberId = Long.parseLong(principal.getName());
         ApiResponse<PostSimpleResponseDto> response = postService.deletePost(memberId, postId);
-        return new ResponseEntity(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @PatchMapping("/{post-id}")
@@ -84,7 +84,7 @@ public class PostController {
 
         Long memberId = Long.parseLong(principal.getName());
         ApiResponse<PostSimpleResponseDto> response = postService.updatePost(memberId, postId, postPatchDto);
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

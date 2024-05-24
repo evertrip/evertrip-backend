@@ -111,8 +111,9 @@ public class PostService {
 
         // Todo: TagsId 여부에 따른 분기 처리
 
-        // Todo: 레디스에 해당 post 정보 저장해주기
-
+        // 레디스에 해당 post 정보 저장해주기
+        PostResponseDto postResponseDto = postRepository.getPostDetail(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
+        cachePost(postResponseDto);
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }
@@ -128,7 +129,8 @@ public class PostService {
 
         // TODO: 게시글 관련 엔티티 삭제 처리(좋아요, 태그, 게시글 로그, 댓글, 파일)
 
-        // TODO: 레디스에 해당 게시글 관련 정보 삭제
+        // 레디스에 해당 게시글 관련 정보 삭제
+        removeCachePost(postId);
 
         // 파일 정보 삭제
         fileService.deleteFileList(FileRequestDto.create(TableName.POST, post.getId()));
@@ -188,9 +190,38 @@ public class PostService {
 
         // Todo: 태그 관련 수정 (태그 분기 처리)
 
-        // Todo: 레디스에 해당 post 수정사항 적용
+        // 레디스에 해당 post 수정사항 적용
+        PostResponseDto postResponseDto = postRepository.getPostDetail(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
+        cachePost(postResponseDto);
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
+    }
+
+    private void cachePost(PostResponseDto dto) {
+        Cache cache = cacheManager.getCache(ConstantPool.CacheName.POST);
+        cache.put(dto.getPostId(), dto);
+    }
+
+    private void removeCachePost(Long postId) {
+        // POST 관련 삭제
+        Cache postCache = cacheManager.getCache(ConstantPool.CacheName.POST);
+        postCache.evict(postId);
+
+        // VIEWS 관련 삭제
+        removeCacheView(postId);
+
+        // VIEWERS 관련 삭제
+        removeCacheViewers(postId);
+
+    }
+
+    private void removeCacheView(Long postId) {
+        Cache viewsCache = cacheManager.getCache(ConstantPool.CacheName.VIEWS);
+        viewsCache.evict(postId);
+    }
+
+    private void removeCacheViewers(Long postId) {
+        redisForSetService.deleteSet(ConstantPool.CacheName.VIEWERS+":"+postId);
     }
 
 
