@@ -178,4 +178,8 @@ public class PostService {
     public List<PostResponseForMainDto> getPostBest30() {
         return postRepository.findTop30Posts();
     }
+
+    public List<PostResponseForMainDto> getPostView30() {
+        return postRepository.findView30Posts();
+    }
 }

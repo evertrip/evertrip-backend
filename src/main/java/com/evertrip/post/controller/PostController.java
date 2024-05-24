@@ -49,9 +49,14 @@ public class PostController {
 
     @GetMapping("/permit/best30")
     public ResponseEntity<ApiResponse<List<PostResponseForMainDto>>> getPostBest30() {
-        System.out.println("요청들어옴");
         ApiResponse<List<PostResponseForMainDto>> response = ApiResponse.successOf(postService.getPostBest30());
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/permit/view30")
+    public ResponseEntity<ApiResponse<List<PostResponseForMainDto>>> getPostView30() {
+        ApiResponse<List<PostResponseForMainDto>> reponse = ApiResponse.successOf(postService.getPostView30());
+        return new ResponseEntity<>(reponse, HttpStatus.OK);
     }
 
     /**

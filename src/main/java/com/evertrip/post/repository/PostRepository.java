@@ -27,7 +27,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "FROM Post p " +
             "JOIN MemberProfile mp ON p.member.id = mp.id " +
             "JOIN PostDetail pd ON p.id = pd.post.id " +
+            "WHERE p.deletedYn = false " +
             "ORDER BY p.likeCount DESC")
     List<PostResponseForMainDto> findTop30Posts();
 
+    @Query("SELECT new com.evertrip.post.dto.response.PostResponseForMainDto(p.id, p.member.id, mp.nickName, p.title, p.createdAt, p.view, p.profileImage, pd.content, p.likeCount) " +
+            "FROM Post p " +
+            "JOIN MemberProfile mp ON p.member.id = mp.id " +
+            "JOIN PostDetail pd ON p.id = pd.post.id " +
+            "WHERE p.deletedYn = false " +
+            "ORDER BY p.view DESC")
+    List<PostResponseForMainDto> findView30Posts();
 }
