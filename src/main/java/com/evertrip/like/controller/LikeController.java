@@ -29,7 +29,11 @@ public class LikeController {
     }
 
     /*단일 글에 대해서 좋아요 한 사람들의 수*/
-//    @GetMapping
-//    public
+    @GetMapping("permit/like/count/{postId}")
+    public ResponseEntity<ApiResponse<LikeCountResponseDto>> getLikeCount(@PathVariable Long postId){
+        ApiResponse<LikeCountResponseDto> response = ApiResponse.successOf(likeService.getLikeCount(postId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
 }
