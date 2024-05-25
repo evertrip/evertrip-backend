@@ -44,7 +44,7 @@ public class PostService {
 
     private final PostDetailRepository postDetailRepository;
 
-    private final RedisForSetService redisForSetService;
+    private final RedisForCacheService redisForCacheService;
 
     private final CacheManager cacheManager;
 
@@ -53,9 +53,9 @@ public class PostService {
     public ApiResponse<PostResponseDto> getPostDetailV1(Long postId, Long memberId) {
 
         // 해당 게시글 조회 시 레디스에 게시글 방문자 명단 확인
-        if (!redisForSetService.isMember(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString())) {
+        if (!redisForCacheService.isMember(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString())) {
             // 게시글 방문자 명단에 없을 시 해당 사용자를 명단에 추가해주고 post 엔티티 조회 후 조회수 1 증가 시키기
-            redisForSetService.addToset(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString());
+            redisForCacheService.addToset(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString());
 
             Post post = postRepository.getPostNotDeleteById(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
             post.plusView();
@@ -74,9 +74,9 @@ public class PostService {
         Long views = postCacheService.getViews(postId).longValue();
 
         // 방문자 리스트에 해당 사용자가 존재하지 않을 시 방문자 리스트에 추가해주고 조회수 1 증가 시켜주기
-        if (!redisForSetService.isMember(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString())) {
+        if (!redisForCacheService.isMember(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString())) {
             // Redis에 방문자 명단 추가
-            redisForSetService.addToset(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString());
+            redisForCacheService.addToset(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString());
 
             // 수동으로 cacheManager를 통해 redis에 조회수 +1 증가 시켜주기
             String viewsCacheKey = postId.toString();
@@ -221,7 +221,7 @@ public class PostService {
     }
 
     private void removeCacheViewers(Long postId) {
-        redisForSetService.deleteSet(ConstantPool.CacheName.VIEWERS+":"+postId);
+        redisForCacheService.deleteSet(ConstantPool.CacheName.VIEWERS+":"+postId);
     }
 
 

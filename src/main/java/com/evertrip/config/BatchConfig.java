@@ -2,6 +2,9 @@ package com.evertrip.config;
 
 import com.evertrip.post.dto.sqs.PostLogDto;
 import com.evertrip.post.entity.PostLog;
+import com.evertrip.post.reader.ViewUpdateReader;
+import com.evertrip.post.service.RedisForCacheService;
+import com.evertrip.post.writer.ViewUpdateWriter;
 import com.evertrip.sqs.processor.SqsProcessor;
 import com.evertrip.sqs.writer.SqsWriter;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
@@ -14,13 +17,15 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.transaction.PlatformTransactionManager;
-import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 import java.time.Duration;
 import java.util.*;
@@ -39,7 +44,10 @@ public class BatchConfig {
     private SqsWriter sqsWriter;
     private SqsProcessor sqsProcessor;
 
-    private SqsAsyncClient sqsAsyncClient;
+    private ViewUpdateReader viewUpdateReader;
+
+    private ViewUpdateWriter viewUpdateWriter;
+
 
     private String queueName;
 
@@ -47,27 +55,37 @@ public class BatchConfig {
 
     private SqsTemplate sqsTemplate;
 
+
     public BatchConfig(JobRepository jobRepository,
                        PlatformTransactionManager platformTransactionManager,
                        SqsWriter sqsWriter,
                        SqsProcessor sqsProcessor,
-                       SqsAsyncClient sqsAsyncClient,
                        SqsTemplate sqsTemplate,
+                       ViewUpdateReader viewUpdateReader,
+                       ViewUpdateWriter viewUpdateWriter,
                        @Value("${cloud.aws.sqs.queue-name}") String queueName) {
         this.jobRepository = jobRepository;
         this.platformTransactionManager = platformTransactionManager;
         this.sqsWriter = sqsWriter;
         this.sqsProcessor = sqsProcessor;
         this.sqsTemplate = sqsTemplate;
-        this.sqsAsyncClient = sqsAsyncClient;
         this.queueName = queueName;
+        this.viewUpdateReader = viewUpdateReader;
+        this.viewUpdateWriter = viewUpdateWriter;
     }
 
 
     @Bean
-    public Job sqsBatchJob(Step step) {
+    public Job sqsBatchJob(Step sqsStep) {
         return new JobBuilder("sqsBatchJob", this.jobRepository)
-                .start(step)
+                .start(sqsStep)
+                .build();
+    }
+
+    @Bean
+    public Job viewUpdateJob(Step viewUpdateStep) {
+        return new JobBuilder("viewUpdateJob", this.jobRepository)
+                .start(viewUpdateStep)
                 .build();
     }
 
@@ -79,6 +97,16 @@ public class BatchConfig {
                 .processor(sqsProcessor)
                 .writer(sqsWriter)
                 .build();
+    }
+
+    @Bean
+    public Step viewUpdateStep() {
+        return new StepBuilder("viewUpdateStep", this.jobRepository)
+                .<Map.Entry<Long, Long>, Map.Entry<Long, Long>>chunk(10, platformTransactionManager)
+                .reader(viewUpdateReader)
+                .writer(viewUpdateWriter)
+                .build();
+
     }
 
 
@@ -121,5 +149,7 @@ public class BatchConfig {
 
         return new ListItemReader<>(inputDataList);
     }
+
+
 
 }

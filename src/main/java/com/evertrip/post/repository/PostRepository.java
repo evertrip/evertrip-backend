@@ -4,7 +4,9 @@ import com.evertrip.post.dto.response.PostResponseDto;
 import com.evertrip.post.entity.Post;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -22,6 +24,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "select p.view from Post p where p.id = :postId and p.deletedYn = false")
     Optional<Long> getViews(@Param("postId") Long postId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update Post p set p.view = :view where p.id = :postId")
+    void updateView(@Param("postId") Long postId, @Param("view") Long view);
+
+
 
 
 }

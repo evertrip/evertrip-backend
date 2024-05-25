@@ -22,10 +22,19 @@ public class BatchScheduler {
     @Autowired
     private Job sqsBatchJob;
 
+    @Autowired
+    private Job viewUpdateJob;
+
 //    @Scheduled(cron = "0 */15 * * * ?")  // 매 15분마다 실행
-//    public void runBatchJob() throws JobExecutionException {
+//    public void runSqsUpdateJob() throws JobExecutionException {
 //        log.info("SQS 스케줄링 동작");
 //        jobLauncher.run(sqsBatchJob, new JobParametersBuilder()
 //                .addLong("uniqueness", System.nanoTime()).toJobParameters());
 //    }
+
+    @Scheduled(cron = "0 */15 * * * ?") // 매 15분마다 실행
+    public void runViewUpdateJob() throws JobExecutionException {
+        log.info("View Update 스케줄링 동작");
+        jobLauncher.run(viewUpdateJob, new JobParametersBuilder().addLong("viewUpdateTimes", System.nanoTime()).toJobParameters());
+    }
 }

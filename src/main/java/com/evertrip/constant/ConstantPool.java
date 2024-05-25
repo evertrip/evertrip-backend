@@ -17,6 +17,9 @@ public class ConstantPool {
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final int DEFAULT_PAGE_NUM = 1;
 
+    // Redis의 조회수을 읽어오기 위한 패턴
+    public static final String viewPattern = "views::*";
+
 
     // 프론트 서버 주소
     public static final String FRONT_SERVER_HOST = "";
