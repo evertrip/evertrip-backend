@@ -5,13 +5,18 @@ import com.evertrip.api.exception.ErrorCode;
 import com.evertrip.api.response.ApiResponse;
 import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
+import com.evertrip.post.dto.request.PostRequestDtoForSearch;
 import com.evertrip.post.dto.response.PostResponseDto;
 import com.evertrip.post.dto.response.PostResponseForMainDto;
+import com.evertrip.post.dto.response.PostResponseForSearchDto;
 import com.evertrip.post.dto.response.PostSimpleResponseDto;
 import com.evertrip.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -55,8 +60,15 @@ public class PostController {
 
     @GetMapping("/permit/view30")
     public ResponseEntity<ApiResponse<List<PostResponseForMainDto>>> getPostView30() {
-        ApiResponse<List<PostResponseForMainDto>> reponse = ApiResponse.successOf(postService.getPostView30());
-        return new ResponseEntity<>(reponse, HttpStatus.OK);
+        ApiResponse<List<PostResponseForMainDto>> response = ApiResponse.successOf(postService.getPostView30());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/permit/main/searchBar/{page}")
+    public ResponseEntity<ApiResponse<Page<PostResponseForSearchDto>>> getPostBySearch(@RequestBody PostRequestDtoForSearch requestDto, @PathVariable long page){
+        Pageable pageable = PageRequest.of((int)page, 20);
+        ApiResponse<Page<PostResponseForSearchDto>> response = ApiResponse.successOf(postService.getPostBySearch(requestDto, pageable));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
