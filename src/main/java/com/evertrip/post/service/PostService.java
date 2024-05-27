@@ -89,6 +89,7 @@ public class PostService {
         return postDetail;
     }
 
+    // TODO: 게시글 생성 시에 게시글 내용에 해당되는 파일들 목록은 따로 받아서 POST_CONTENT_FILE에 INSERT 해줘야합니다.
     public ApiResponse<PostSimpleResponseDto> createPost(PostRequestDto dto, Long memberId) {
         Member member = memberRepository.findByIdNotDeleted(memberId).orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 

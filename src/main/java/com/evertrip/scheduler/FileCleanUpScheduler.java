@@ -1,10 +1,12 @@
 package com.evertrip.scheduler;
 
 import com.evertrip.file.dto.schedule.DeletedFileInfo;
+import com.evertrip.file.dto.schedule.DeletedPostContentFile;
 import com.evertrip.file.entity.File;
 import com.evertrip.file.handler.FileHandler;
 import com.evertrip.file.repository.FileInfoRepository;
 import com.evertrip.file.repository.FileRepository;
+import com.evertrip.file.repository.PostContentFileRepository;
 import com.evertrip.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ public class FileCleanUpScheduler {
 
     private final FileHandler fileHandler;
 
+    private final PostContentFileRepository postContentFileRepository;
+
 
 
     /**
@@ -35,6 +39,7 @@ public class FileCleanUpScheduler {
      */
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
+
     public void cleanUpExpiredFileInfosData() {
         // 삭제해야할 파일 정보 찾기
         // Mysql RDS 인스턴스 타임존 설정을 UTC로 해서 쿼리상으로 KST 시간으로 변환해줬다
@@ -42,7 +47,7 @@ public class FileCleanUpScheduler {
         List<DeletedFileInfo> deletedFileInfos = fileInfoRepository.findDeletedFileInfo();
         log.info("삭제 대상 파일 Info size: " + deletedFileInfos.size());
         // TODO: 성능 개선을 위해 Spring Batch 혹은 벌크 연산을 이용하는 것이 좋아보인다
-        for (DeletedFileInfo fileInfo: deletedFileInfos) {
+        for (DeletedFileInfo fileInfo : deletedFileInfos) {
             File findFile = fileService.findFile(fileInfo.getFileId());
 
             // 파일, 파일 정보 테이블 delete 로직
@@ -53,25 +58,38 @@ public class FileCleanUpScheduler {
             fileHandler.delete(findFile.getFileName());
         }
 
+        // 삭제해야할 게시글 내용 파일 찾기
+        List<DeletedPostContentFile> deletedPostContentFile = postContentFileRepository.findDeletedPostContentFile();
+        log.info("삭제 대상 게시글 내용 파일 size: " + deletedFileInfos.size());
 
+        for (DeletedPostContentFile postContentFile : deletedPostContentFile) {
+            File findFile = fileService.findFile(postContentFile.getFileId());
+
+            // 파일, 파일 정보 테이블 delete 로직
+            postContentFileRepository.hardDeletePostContentFile(postContentFile.getId());
+            fileRepository.hardDeleteFile(findFile.getId());
+
+            // S3 저장소에 파일 삭제 로직
+            fileHandler.delete(findFile.getFileName());
+        }
 
     }
 
     /**
-     * 파일 정보에 속하지 않은 파일 테이블의 데이터를 스케줄링한다
+     * 파일 정보와 게시글 파일 테이블에 속하지 않은 파일 테이블의 데이터를 스케줄링한다
      * 매일 자정에 스케줄링이 동작하게 된다
      */
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0/30 * * * * *")
     @Transactional
     public void cleanUpUnmatchedFile() {
         // 삭제해야할 파일 찾기
         log.info("파일 정기 삭제 스케줄러 동작");
-        List<File> filesToCleanUp = fileRepository.findFilesWithNoFileInfo();
+        List<File> filesToCleanUp = fileRepository.findFilesUnrelated();
         log.info("정기 삭제 대상 파일 size : " + filesToCleanUp.size());
         // TODO: 성능 개선을 위해 Spring Batch 혹은 벌크 연산을 이용하는 것이 좋아보인다
-        for (File file: filesToCleanUp) {
+        for (File file : filesToCleanUp) {
             // 파일 테이블 delete 로직
-            fileRepository.hardDeleteFile(file.getId());
+            fileRepository.hardDeleteFileExpired(file.getId());
             // S3 저장소에 파일 삭제 로직
             fileHandler.delete(file.getFileName());
         }
