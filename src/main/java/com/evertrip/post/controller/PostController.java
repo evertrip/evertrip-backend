@@ -66,7 +66,7 @@ public class PostController {
 
     @GetMapping("/permit/main/searchBar/{page}")
     public ResponseEntity<ApiResponse<Page<PostResponseForSearchDto>>> getPostBySearch(@RequestBody PostRequestDtoForSearch requestDto, @PathVariable long page){
-        Pageable pageable = PageRequest.of((int)page, 20);
+        Pageable pageable = PageRequest.of((int)page, 5);
         ApiResponse<Page<PostResponseForSearchDto>> response = ApiResponse.successOf(postService.getPostBySearch(requestDto, pageable));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

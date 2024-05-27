@@ -10,12 +10,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
+
+public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
 
     @Query(value = "select new com.evertrip.post.dto.response.PostResponseDto(p.id, p.title, mp.id, mp.nickName, mp.profileImage, p.view, p.likeCount,p.createdAt, p.updatedAt, pd.content ) from Post p " +
             "join PostDetail pd on pd.post.id = p.id and pd.deletedYn = false " +
@@ -65,7 +67,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //            "JOIN tag t ON pt.tag_id = t.tag_id " +
 //            "WHERE t.tag_name LIKE CONCAT('%', :searchTags, '%') " +
 //            "AND :searchTags IS NOT NULL) AS results")
-    List<PostResponseForSearchDto> findPostBySearch(String searchContent, String searchTags);
+//    List<PostResponseForSearchDto> findPostBySearch(String searchContent, String searchTags);
 
     Page<Post> findAll(Specification<Post> spec, Pageable pageable);
 
