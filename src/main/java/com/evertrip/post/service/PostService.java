@@ -27,7 +27,6 @@ import com.evertrip.post.entity.PostDetail;
 import com.evertrip.post.repository.PostDetailRepository;
 import com.evertrip.post.repository.PostRepository;
 import com.evertrip.post.specifications.PostSpecifications;
-import com.evertrip.tag.entity.PostTags;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -195,16 +194,14 @@ public class PostService {
 
 
     public Page<PostResponseForSearchDto> getPostBySearch(PostRequestDtoForSearch requestDto, Pageable pageable) {
-        Specification<Post> spec1 = Specification.where(PostSpecifications.distinct());
-        Specification<Post> spec2 = Specification.where(PostSpecifications.distinct());
+        Specification<Post> spec = Specification.where(PostSpecifications.distinct());
 
         if (requestDto.getSearchContent() != null && !requestDto.getSearchContent().isEmpty()) {
-            spec1 = spec1.and(PostSpecifications.titleContains(requestDto.getSearchContent()));
+            spec = spec.and(PostSpecifications.titleContains(requestDto.getSearchContent()));
         }
         if (requestDto.getSearchTags() != null && !requestDto.getSearchTags().isEmpty()) {
-            spec2 = spec2.and(PostSpecifications.tagNameContains(requestDto.getSearchTags()));
+            spec = spec.and(PostSpecifications.tagNameContains(requestDto.getSearchTags()));
         }
-
 
         Page<Post> postPage = postRepository.findAll(spec, pageable);
         return postPage.map(this::convertToDto);
