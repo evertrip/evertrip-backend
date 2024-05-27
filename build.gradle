@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.4'
 	id 'io.spring.dependency-management' version '1.1.4'
+	// spring-rest-docs 추가
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com'
@@ -15,6 +17,13 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	// spring-rest-docs 추가
+	asciidoctorExt
+}
+
+// spring-rest-docs 추가
+ext {
+	set('snippetsDir', file("build/generated-snippets"))
 }
 
 repositories {
@@ -47,8 +56,41 @@ dependencies {
 	// 메시지 큐 의존성 추가, Spring 3.0 버전 이상이라면 아래로 설정
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+	// spring-rest-docs 추가
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
+// spring-rest-docs 추가
 tasks.named('test') {
+	outputs.dir snippetsDir
 	useJUnitPlatform()
+	finalizedBy asciidoctor
+}
+// spring-rest-docs 추가
+tasks.named('asciidoctor') {
+	dependsOn test
+	configurations 'asciidoctorExt'
+	inputs.dir snippetsDir
+	finalizedBy copyDocument
+	doFirst {
+		delete file('src/main/resources/static/docs')
+	}
+}
+// spring-rest-docs 추가
+task copyDocument(type: Copy) {
+	dependsOn asciidoctor
+	from file('build/docs/asciidoc')
+	into file('src/main/resources/static/docs')
+}
+
+// spring-rest-docs 추가
+bootJar {
+	dependsOn asciidoctor
+	doFirst {
+		delete file('static/docs')
+	}
+	from("${asciidoctor.outputDir}") {
+		into 'static/docs'
+	}
 }

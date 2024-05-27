@@ -47,7 +47,7 @@ public class MemberController {
             throw new ApplicationException(ErrorCode.CRYPT_ERROR);
         }
 
-        return new ResponseEntity(ApiResponse.successOf(principal.getName() + " 삭제완료"), HttpStatus.OK);
+        return new ResponseEntity(ApiResponse.successOf(new MemberSimpleResponseDto(Long.parseLong(principal.getName()))), HttpStatus.OK);
     }
 
     /**
