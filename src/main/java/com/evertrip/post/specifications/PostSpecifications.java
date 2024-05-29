@@ -11,7 +11,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 public class PostSpecifications {
 
     public static Specification<Post> titleContains(String searchContent) {

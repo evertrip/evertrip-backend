@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AutoConfiguration
 public class PostRequestDtoForSearch {
     private String searchContent;
-    private String searchTags;
+    private List<String> searchTags;
 }

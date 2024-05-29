@@ -200,15 +200,19 @@ public class PostService {
             spec = spec.and(PostSpecifications.titleContains(requestDto.getSearchContent()));
         }
         if (requestDto.getSearchTags() != null && !requestDto.getSearchTags().isEmpty()) {
-            spec = spec.and(PostSpecifications.tagNameContains(requestDto.getSearchTags()));
-        }
+            // Stream을 사용하여 각 태그에 대해 스펙을 생성하고 최종적으로 모두 결합
+            Specification<Post> tagsSpec = requestDto.getSearchTags().stream()
+                    .map(PostSpecifications::tagNameContains)
+                    .reduce(Specification::or)
+                    .orElse(Specification.where(null));  // 태그가 없는 경우 기본 스펙으로 fallback
 
+            spec = spec.and(tagsSpec);
+        }
         Page<Post> postPage = postRepository.findAll(spec, pageable);
         return postPage.map(this::convertToDto);
     }
 
     private PostResponseForSearchDto convertToDto(Post post) {
-        // Post 엔티티를 PostResponseForSearchDto로 변환
         MemberProfile memberProfile = memberProfileRepository.findByMemberId(post.getMember().getId(), post.getMember().isDeletedYn()).orElseThrow();
         PostDetail postDetail = postDetailRepository.findByPostId(post.getId()).orElseThrow();
         PostResponseForSearchDto response =  PostResponseForSearchDto.builder()
