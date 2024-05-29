@@ -2,9 +2,13 @@ package com.evertrip.file.repository;
 
 import com.evertrip.file.dto.schedule.DeletedFileInfo;
 import com.evertrip.file.dto.schedule.DeletedPostContentFile;
+import com.evertrip.file.entity.PostContentFile;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,4 +27,26 @@ public class PostContentFileRepositoryImpl implements PostContentFileCustom {
             return data;
         });
     }
+
+    @Override
+    public void batchInsertPostContentFiles(List<PostContentFile> postContentFiles) {
+        String sql = "INSERT INTO post_content_file "
+                + "(post_id, file_id, deleted_at) VALUES (?, ?, ?)";
+
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                PostContentFile postContentFile = postContentFiles.get(i);
+                ps.setLong(1,postContentFile.getPostId());
+                ps.setLong(2,postContentFile.getFileId());
+                ps.setObject(3, postContentFile.getDeletedAt());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return postContentFiles.size();
+            }
+        });
+    }
+
 }

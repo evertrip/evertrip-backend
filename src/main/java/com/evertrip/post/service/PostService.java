@@ -9,6 +9,8 @@ import com.evertrip.file.common.TableName;
 import com.evertrip.file.dto.request.FileRequestDto;
 import com.evertrip.file.entity.File;
 import com.evertrip.file.entity.FileInfo;
+import com.evertrip.file.entity.PostContentFile;
+import com.evertrip.file.repository.PostContentFileRepository;
 import com.evertrip.file.service.FileService;
 import com.evertrip.member.entity.Member;
 import com.evertrip.member.repository.MemberRepository;
@@ -27,6 +29,10 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -50,6 +56,8 @@ public class PostService {
 
     private final PostCacheService postCacheService;
 
+    private final PostContentFileRepository postContentFileRepository;
+
     public ApiResponse<PostResponseDto> getPostDetailV1(Long postId, Long memberId) {
 
         // 해당 게시글 조회 시 레디스에 게시글 방문자 명단 확인
@@ -68,7 +76,7 @@ public class PostService {
 
     public PostResponseDto getPostDetailV2(Long postId, Long memberId) {
         // 레디스에 해당 post가 존재할 시 레디스 정보를 넘겨주고 없을 시 실제 DB 조회 후 레디스에 저장
-        PostResponseDto postDetail = postCacheService.getPostDetailUsingCachable(postId);
+        PostResponseDto postDetail = postCacheService.getPostDetailUsingCacheable(postId);
 
         // 조회수(제일 최신)는 Redis에서 조회해서 postDetail의 조회수에 넣어줍니다.
         Long views = postCacheService.getViews(postId).longValue();
@@ -89,8 +97,10 @@ public class PostService {
         return postDetail;
     }
 
-    // TODO: 게시글 생성 시에 게시글 내용에 해당되는 파일들 목록은 따로 받아서 POST_CONTENT_FILE에 INSERT 해줘야합니다.
-    public ApiResponse<PostSimpleResponseDto> createPost(PostRequestDto dto, Long memberId) {
+    /**
+     * 게시글 생성 로직 V1 - JPA saveAll() 사용
+     */
+    public ApiResponse<PostSimpleResponseDto> createPostV1(PostRequestDto dto, Long memberId) {
         Member member = memberRepository.findByIdNotDeleted(memberId).orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
         Post post;
@@ -109,12 +119,69 @@ public class PostService {
         PostDetail postDetail = new PostDetail(post, dto.getContent());
         postDetailRepository.save(postDetail);
 
+        // PostContentFile 저장
+        if (dto.getContentFileIds()!=null && dto.getContentFileIds().size()!=0) {
+            List<Long> contentFileIds = dto.getContentFileIds();
+            List<PostContentFile> postContentFileList = new ArrayList<>();
+            for (Long id: contentFileIds) {
+                PostContentFile postContentFile = new PostContentFile(id, post.getId());
+                postContentFileList.add(postContentFile);
+            }
+            postContentFileRepository.saveAll(postContentFileList);
+        }
 
         // Todo: TagsId 여부에 따른 분기 처리
 
         // 레디스에 해당 post 정보 저장해주기
         PostResponseDto postResponseDto = postRepository.getPostDetail(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         cachePost(postResponseDto);
+
+
+
+        return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
+    }
+
+
+    /**
+     * 게시글 생성 로직 V2 - JDBC BATCH INSERT 사용
+     */
+    public ApiResponse<PostSimpleResponseDto> createPostV2(PostRequestDto dto, Long memberId) {
+        Member member = memberRepository.findByIdNotDeleted(memberId).orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        Post post;
+
+        // File Id 여부에 따른 분기 처리
+        if (dto.getFileId()==null) {
+            post = new Post(member, dto.getTitle());
+            postRepository.save(post);
+        } else {
+            File file = fileService.findFile(dto.getFileId());
+            post = new Post(member, dto.getTitle(), file.getPath());
+            postRepository.save(post);
+            fileService.saveFileInfo(new FileInfo(TableName.POST, post.getId(), file));
+        }
+
+        PostDetail postDetail = new PostDetail(post, dto.getContent());
+        postDetailRepository.save(postDetail);
+
+        // PostContentFile 저장
+        if (dto.getContentFileIds()!=null && dto.getContentFileIds().size()!=0) {
+            List<Long> contentFileIds = dto.getContentFileIds();
+            List<PostContentFile> postContentFileList = new ArrayList<>();
+            for (Long id: contentFileIds) {
+                PostContentFile postContentFile = new PostContentFile(id, post.getId());
+                postContentFileList.add(postContentFile);
+            }
+            postContentFileRepository.batchInsertPostContentFiles(postContentFileList);
+        }
+
+        // Todo: TagsId 여부에 따른 분기 처리
+
+        // 레디스에 해당 post 정보 저장해주기
+        PostResponseDto postResponseDto = postRepository.getPostDetail(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
+        cachePost(postResponseDto);
+
+
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }
@@ -141,6 +208,9 @@ public class PostService {
 
         PostDetail postDetail = postDetailRepository.findByPostId(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         postDetail.deletePostDetail();
+
+        // 해당 게시글 관련 게시글_컨텐츠_파일 테이블 정보 삭제하기
+        postContentFileRepository.softDeletePostContentFilesByPostId(postId, LocalDateTime.now());
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }

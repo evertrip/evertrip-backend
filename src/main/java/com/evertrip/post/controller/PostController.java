@@ -58,7 +58,7 @@ public class PostController {
         }
 
         Long memberId = Long.parseLong(principal.getName());
-        ApiResponse<PostSimpleResponseDto> response = postService.createPost(dto, memberId);
+        ApiResponse<PostSimpleResponseDto> response = postService.createPostV2(dto, memberId);
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 

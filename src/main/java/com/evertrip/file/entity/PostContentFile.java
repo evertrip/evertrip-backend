@@ -3,12 +3,14 @@ package com.evertrip.file.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
 @Getter
+@ToString
 public class PostContentFile {
 
     @Id

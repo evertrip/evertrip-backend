@@ -6,12 +6,13 @@ spring:
         #        show_sql: true 시스템아웃을 통해 찍음
         format_sql: true
         jdbc:
-          batch_size: 200
+          batch_size: 30
   batch:
     jdbc:
       initialize-schema: always
     job:
       enabled: false
+
 ## 순환 참조 에러 제거
   main:
     allow-circular-references: true
@@ -23,8 +24,11 @@ spring:
     username: ENC(JHya4zdkPrjKceTY2xkHYw==)
     password: ENC(EgXQEVAqfj6qieIHR8xelfP2mHdacrh4)
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 50
+      connection-timeout: 30000
 
-## 파일 크기 지정
+  ## 파일 크기 지정
   servlet:
     multipart:
       max-file-size: 10MB
@@ -57,6 +61,7 @@ logging:
     org:
       springframework:
         security: DEBUG
+        jdbc: DEBUG
 ## 대칭키 암호화 설정(개인정보 암호화 시 사용)
 symmetricCrypto:
   secret: ENC(kyj221KeDRO2F0MOiV3FJfgRzctOgpptDy+ZtuqI5iXk6+k0p08dfHHu8kjSwJ6jmF49MNR23EA=)

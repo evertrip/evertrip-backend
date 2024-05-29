@@ -79,7 +79,7 @@ public class FileCleanUpScheduler {
      * 파일 정보와 게시글 파일 테이블에 속하지 않은 파일 테이블의 데이터를 스케줄링한다
      * 매일 자정에 스케줄링이 동작하게 된다
      */
-    @Scheduled(cron = "0/30 * * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void cleanUpUnmatchedFile() {
         // 삭제해야할 파일 찾기

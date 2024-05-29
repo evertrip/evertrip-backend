@@ -20,6 +20,8 @@ public class PostRequestDto {
 
     private List<Long> tagsId;
 
+    private List<Long> contentFileIds;
+
     private Long fileId;
 
 }

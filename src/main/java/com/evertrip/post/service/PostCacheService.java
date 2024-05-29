@@ -16,7 +16,7 @@ public class PostCacheService {
     private final PostRepository postRepository;
 
     @Cacheable(value = ConstantPool.CacheName.POST, key = "#postId")
-    public PostResponseDto getPostDetailUsingCachable(Long postId) {
+    public PostResponseDto getPostDetailUsingCacheable(Long postId) {
         PostResponseDto postDetail = postRepository.getPostDetail(postId).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         return postDetail;
     }
