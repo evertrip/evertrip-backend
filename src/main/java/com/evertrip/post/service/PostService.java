@@ -12,7 +12,6 @@ import com.evertrip.file.entity.FileInfo;
 import com.evertrip.file.service.FileService;
 import com.evertrip.member.entity.Member;
 import com.evertrip.member.entity.MemberProfile;
-import com.evertrip.member.repository.MemberDetailRepository;
 import com.evertrip.member.repository.MemberProfileRepository;
 import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.post.dto.request.PostPatchDto;
@@ -183,13 +182,14 @@ public class PostService {
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }
 
-
-    public List<PostResponseForMainDto> getPostBest30() {
-        return postRepository.findTop30Posts();
+    @Cacheable(cacheNames = "Best30")
+    public List<PostResponseForMainDto> getPostBest30(Pageable pageable) {
+        return postRepository.findTop30Posts(pageable);
     }
 
-    public List<PostResponseForMainDto> getPostView30() {
-        return postRepository.findView30Posts();
+    @Cacheable(cacheNames = "view30")
+    public List<PostResponseForMainDto> getPostView30(Pageable pageable) {
+        return postRepository.findView30Posts(pageable);
     }
 
 

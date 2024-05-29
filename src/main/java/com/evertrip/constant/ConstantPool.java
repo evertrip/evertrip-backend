@@ -32,6 +32,8 @@ public class ConstantPool {
         public static final String VIEWS = "views";
     }
 
+    //메인페이지 view, best slide post 개수
+    public static final int MAIN_POST_SIZE_FOR_SLIDE = 30;
 
     // 소셜 로그인 타입
     public enum SocialLoginType {

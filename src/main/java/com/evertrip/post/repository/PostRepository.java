@@ -36,38 +36,17 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
             "JOIN PostDetail pd ON p.id = pd.post.id " +
             "WHERE p.deletedYn = false " +
             "ORDER BY p.likeCount DESC")
-    List<PostResponseForMainDto> findTop30Posts();
+    List<PostResponseForMainDto> findTop30Posts(Pageable pageable);
 
     @Query("SELECT new com.evertrip.post.dto.response.PostResponseForMainDto(p.id, p.member.id, mp.nickName, p.title, p.createdAt, p.view, p.profileImage, pd.content, p.likeCount) " +
             "FROM Post p " +
             "JOIN MemberProfile mp ON p.member.id = mp.id " +
             "JOIN PostDetail pd ON p.id = pd.post.id " +
             "WHERE p.deletedYn = false " +
-            "ORDER BY p.view DESC")
-    List<PostResponseForMainDto> findView30Posts();
+            "ORDER BY p.view DESC" )
+    List<PostResponseForMainDto> findView30Posts(Pageable pageable);
 
 
-//    @Query( "SELECT DISTINCT * FROM (" +
-//            "SELECT p.post_id AS id, p.title, mp.memberprifileId , mp.nickname, mp.profile_image, p.view, " +
-//            "p.like_count, p.created_at, p.updated_at, pd.content " +
-//            "FROM post p " +
-//            "JOIN post_detail pd ON p.post_id = pd.post_id " +
-//            "JOIN member m ON p.member_id = m.member_id " +
-//            "JOIN member_profile mp ON p.member_id = mp.member_id " +
-//            "WHERE p.title LIKE CONCAT('%', :searchContent, '%') " +
-//            "AND :searchContent IS NOT NULL " +
-//            "UNION " +
-//            "SELECT p.post_id AS id, p.title, m.member_id, mp.nickname, mp.profile_image, p.view, " +
-//            "p.like_count, p.created_at, p.updated_at, pd.content " +
-//            "FROM post p " +
-//            "JOIN post_detail pd ON p.post_id = pd.post_id " +
-//            "JOIN member m ON p.member_id = m.member_id " +
-//            "JOIN member_profile mp ON p.member_id = mp.member_id " +
-//            "JOIN post_tags pt ON p.post_id = pt.post_id " +
-//            "JOIN tag t ON pt.tag_id = t.tag_id " +
-//            "WHERE t.tag_name LIKE CONCAT('%', :searchTags, '%') " +
-//            "AND :searchTags IS NOT NULL) AS results")
-//    List<PostResponseForSearchDto> findPostBySearch(String searchContent, String searchTags);
 
     Page<Post> findAll(Specification<Post> spec, Pageable pageable);
 
