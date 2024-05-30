@@ -24,6 +24,8 @@ import com.evertrip.post.repository.PostDetailRepository;
 import com.evertrip.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -57,6 +60,8 @@ public class PostService {
     private final PostCacheService postCacheService;
 
     private final PostContentFileRepository postContentFileRepository;
+
+    private final RedissonClient redissonClient;
 
     public ApiResponse<PostResponseDto> getPostDetailV1(Long postId, Long memberId) {
 
@@ -86,13 +91,35 @@ public class PostService {
             // Redis에 방문자 명단 추가
             redisForCacheService.addToset(ConstantPool.CacheName.VIEWERS + ":" + postId, memberId.toString());
 
-            // 수동으로 cacheManager를 통해 redis에 조회수 +1 증가 시켜주기
-            String viewsCacheKey = postId.toString();
-            Cache viewsCache = cacheManager.getCache(ConstantPool.CacheName.VIEWS);
-            viewsCache.put(viewsCacheKey, views+1);
+            // Redisson 락킹 적용
+            String lockKey = "lock:viewCount:"+postId;
+            RLock lock = redissonClient.getLock(lockKey);
 
-            views = views+1;
+            try {
+                // 락을 얻기 위한 재시도(Lock 획득을 시도하는 최대 시간, 락을 획득한 후 점유하는 최대 시간, 시간 단위)
+                if (lock.tryLock(5, 2, TimeUnit.SECONDS)) {
+                    try {
+                        // 수동으로 cacheManager를 통해 redis에 조회수 +1 증가 시켜주기
+                        String viewsCacheKey = postId.toString();
+                        Cache viewsCache = cacheManager.getCache(ConstantPool.CacheName.VIEWS);
+                        Cache.ValueWrapper valueWrapper = viewsCache.get(postId.toString());
+                        Long currentViews = ((Integer) valueWrapper.get()).longValue();
+                        viewsCache.put(viewsCacheKey, currentViews + 1L);
+                        views = currentViews+1L;
+                    } finally {
+                        lock.unlock();
+                    }
+                } else {
+                    // 락을 얻지 못한 경우 처리
+                    log.warn("Could not acquire lock for key: {}", lockKey);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Could not acquire lock for key: {}",lockKey);
+                throw new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
         }
+
         postDetail.setView(views);
         return postDetail;
     }

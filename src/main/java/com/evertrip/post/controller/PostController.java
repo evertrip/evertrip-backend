@@ -72,6 +72,9 @@ public class PostController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    /**
+     * 게시글 수정
+     */
     @PatchMapping("/{post-id}")
     public ResponseEntity<ApiResponse<PostSimpleResponseDto>> updatePost(@PathVariable("post-id") Long postId,
                                                                          @Valid @RequestBody PostPatchDto postPatchDto,

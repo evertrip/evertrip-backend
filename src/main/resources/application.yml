@@ -61,7 +61,7 @@ logging:
     org:
       springframework:
         security: DEBUG
-        jdbc: DEBUG
+#        jdbc: DEBUG
 ## 대칭키 암호화 설정(개인정보 암호화 시 사용)
 symmetricCrypto:
   secret: ENC(kyj221KeDRO2F0MOiV3FJfgRzctOgpptDy+ZtuqI5iXk6+k0p08dfHHu8kjSwJ6jmF49MNR23EA=)
