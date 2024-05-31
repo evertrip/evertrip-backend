@@ -11,7 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,16 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     @Query(value = "select p from Post p where p.id = :postId and p.deletedYn = false")
     Optional<Post> getPostNotDeleteById(@Param("postId") Long postId);
+
+    @Query(value = "select p.view from Post p where p.id = :postId and p.deletedYn = false")
+    Optional<Long> getViews(@Param("postId") Long postId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update Post p set p.view = :view where p.id = :postId")
+    void updateView(@Param("postId") Long postId, @Param("view") Long view);
+
+
 
 
     @Query("SELECT new com.evertrip.post.dto.response.PostResponseForMainDto(p.id, p.member.id, mp.nickName, p.title, p.createdAt, p.view, p.profileImage, pd.content, p.likeCount) " +

@@ -138,8 +138,6 @@ public class OauthService {
                 String refresh = refreshTokenProvider.createToken(authentication, ipAddress);
 
                 Cookie jwtCookie = new Cookie(AUTHORIZATION_HEADER,  jwt);
-                jwtCookie.setHttpOnly(true);
-                jwtCookie.setSecure(true);
                 jwtCookie.setPath("/");
                 response.addCookie(jwtCookie);
 

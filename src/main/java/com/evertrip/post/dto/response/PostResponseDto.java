@@ -41,4 +41,8 @@ public class PostResponseDto {
         this.updatedAt = updatedAt.toString().replace("T"," ");;
         this.content = content;
     }
+
+    public void setView(Long view) {
+        this.view = view;
+    }
 }

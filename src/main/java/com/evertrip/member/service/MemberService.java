@@ -18,6 +18,7 @@ import com.evertrip.member.repository.MemberDetailRepository;
 import com.evertrip.member.repository.MemberProfileRepository;
 import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.security.jwt.HmacAndBase64;
+import com.evertrip.security.jwt.SymmetricCrypto;
 import com.evertrip.security.redis.TokenStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -49,12 +50,19 @@ public class MemberService {
 
     private final HmacAndBase64 hmacAndBase64;
 
+    private final SymmetricCrypto crypto;
+
     /**
      * Member pk로 회원 프로필 조회하기
      */
     @Transactional(readOnly = true)
     public List<MemberProfileResponseDto> getMemberProfiles(Long memberId) {
         List<MemberProfileResponseDto> memberProfiles = memberProfileRepository.findMemberProfiles(memberId, false);
+
+        for (MemberProfileResponseDto profile: memberProfiles) {
+            String decryptedEmail = crypto.decrypt(profile.getEmail());
+            profile.setEmail(decryptedEmail);
+        }
         return memberProfiles;
     }
 

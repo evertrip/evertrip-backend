@@ -27,6 +27,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/api")
 public class MemberController {
 
     private final TokenStorageService redisService;
@@ -47,7 +48,7 @@ public class MemberController {
             throw new ApplicationException(ErrorCode.CRYPT_ERROR);
         }
 
-        return new ResponseEntity(ApiResponse.successOf(principal.getName() + " 삭제완료"), HttpStatus.OK);
+        return new ResponseEntity(ApiResponse.successOf(new MemberSimpleResponseDto(Long.parseLong(principal.getName()))), HttpStatus.OK);
     }
 
     /**

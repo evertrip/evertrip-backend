@@ -1,5 +1,8 @@
 package com.evertrip.constant;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 import java.util.List;
 
 public class ConstantPool {
@@ -13,6 +16,9 @@ public class ConstantPool {
     // page navigates(페이지 쪽수의 갯수)
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final int DEFAULT_PAGE_NUM = 1;
+
+    // Redis의 조회수을 읽어오기 위한 패턴
+    public static final String viewPattern = "views::*";
 
 
     // 프론트 서버 주소
@@ -30,6 +36,16 @@ public class ConstantPool {
         public static final String POST = "post";
 
         public static final String VIEWS = "views";
+
+        public static final String VIEWERS = "viewers";
+    }
+
+    // POST_EVENT_TYPE
+    public enum EventType {
+        VIEWER,
+        SCROLL,
+        STAYING,
+        HISTORY
     }
 
     //메인페이지 view, best slide post 개수

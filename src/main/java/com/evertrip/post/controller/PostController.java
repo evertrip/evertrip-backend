@@ -35,20 +35,22 @@ public class PostController {
     private final PostService postService;
 
     /**
-     * 게시글 단일 조회
+     * 게시글 단일 상세 조회
      */
-    @GetMapping("/{post-id}")
-    public ResponseEntity<ApiResponse<PostResponseDto>> getPostDetail(@PathVariable("post-id") Long postId) {
-        ApiResponse<PostResponseDto> postDetail = postService.getPostDetail(postId);
+    @GetMapping("/{post-id}/v1")
+    public ResponseEntity<ApiResponse<PostResponseDto>> getPostDetailV1(@PathVariable("post-id") Long postId,Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        ApiResponse<PostResponseDto> postDetail = postService.getPostDetailV1(postId,memberId);
         return ResponseEntity.ok(postDetail);
     }
 
     /**
-     * 게시글 단일 조회 (캐싱 적용)
+     * 게시글 단일 상세 조회 (캐싱 적용)
      */
-    @GetMapping("/v2/{post-id}")
-    public ResponseEntity<ApiResponse<PostResponseDto>> getPostDetailV2(@PathVariable("post-id") Long postId) {
-        PostResponseDto postDetail = postService.getPostDetailV2(postId);
+    @GetMapping("/{post-id}/v2")
+    public ResponseEntity<ApiResponse<PostResponseDto>> getPostDetailV2(@PathVariable("post-id") Long postId, Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        PostResponseDto postDetail = postService.getPostDetailV2(postId,memberId);
         return ResponseEntity.ok(ApiResponse.successOf(postDetail));
     }
 
@@ -86,7 +88,7 @@ public class PostController {
         }
 
         Long memberId = Long.parseLong(principal.getName());
-        ApiResponse<PostSimpleResponseDto> response = postService.createPost(dto, memberId);
+        ApiResponse<PostSimpleResponseDto> response = postService.createPostV2(dto, memberId);
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
@@ -97,9 +99,12 @@ public class PostController {
     public ResponseEntity<ApiResponse<PostSimpleResponseDto>> deletePost(@PathVariable("post-id") Long postId, Principal principal) {
         Long memberId = Long.parseLong(principal.getName());
         ApiResponse<PostSimpleResponseDto> response = postService.deletePost(memberId, postId);
-        return new ResponseEntity(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    /**
+     * 게시글 수정
+     */
     @PatchMapping("/{post-id}")
     public ResponseEntity<ApiResponse<PostSimpleResponseDto>> updatePost(@PathVariable("post-id") Long postId,
                                                                          @Valid @RequestBody PostPatchDto postPatchDto,
@@ -112,7 +117,7 @@ public class PostController {
 
         Long memberId = Long.parseLong(principal.getName());
         ApiResponse<PostSimpleResponseDto> response = postService.updatePost(memberId, postId, postPatchDto);
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
