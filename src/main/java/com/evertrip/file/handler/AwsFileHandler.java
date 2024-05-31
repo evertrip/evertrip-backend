@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Component
-public class AwsFileHandler implements FileHandler {
+public class
+AwsFileHandler implements FileHandler {
 
     private final String bucket;
 

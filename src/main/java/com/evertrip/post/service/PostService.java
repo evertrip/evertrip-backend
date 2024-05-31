@@ -13,21 +13,31 @@ import com.evertrip.file.entity.PostContentFile;
 import com.evertrip.file.repository.PostContentFileRepository;
 import com.evertrip.file.service.FileService;
 import com.evertrip.member.entity.Member;
+import com.evertrip.member.entity.MemberProfile;
+import com.evertrip.member.repository.MemberProfileRepository;
 import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
+import com.evertrip.post.dto.request.PostRequestDtoForSearch;
 import com.evertrip.post.dto.response.PostResponseDto;
+import com.evertrip.post.dto.response.PostResponseForMainDto;
+import com.evertrip.post.dto.response.PostResponseForSearchDto;
 import com.evertrip.post.dto.response.PostSimpleResponseDto;
 import com.evertrip.post.entity.Post;
 import com.evertrip.post.entity.PostDetail;
 import com.evertrip.post.repository.PostDetailRepository;
 import com.evertrip.post.repository.PostRepository;
+import com.evertrip.post.specifications.PostSpecifications;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -56,6 +66,7 @@ public class PostService {
     private final RedisForCacheService redisForCacheService;
 
     private final CacheManager cacheManager;
+    private final MemberProfileRepository memberProfileRepository;
 
     private final PostCacheService postCacheService;
 
@@ -322,5 +333,52 @@ public class PostService {
         redisForCacheService.deleteSet(ConstantPool.CacheName.VIEWERS+":"+postId);
     }
 
+    @Cacheable(cacheNames = "Best30")
+    public List<PostResponseForMainDto> getPostBest30(Pageable pageable) {
+        return postRepository.findTop30Posts(pageable);
+    }
+
+    @Cacheable(cacheNames = "view30")
+    public List<PostResponseForMainDto> getPostView30(Pageable pageable) {
+        return postRepository.findView30Posts(pageable);
+    }
+
+
+    public Page<PostResponseForSearchDto> getPostBySearch(PostRequestDtoForSearch requestDto, Pageable pageable) {
+        Specification<Post> spec = Specification.where(PostSpecifications.distinct());
+
+        if (requestDto.getSearchContent() != null && !requestDto.getSearchContent().isEmpty()) {
+            spec = spec.and(PostSpecifications.titleContains(requestDto.getSearchContent()));
+        }
+        if (requestDto.getSearchTags() != null && !requestDto.getSearchTags().isEmpty()) {
+            // Stream을 사용하여 각 태그에 대해 스펙을 생성하고 최종적으로 모두 결합
+            Specification<Post> tagsSpec = requestDto.getSearchTags().stream()
+                    .map(PostSpecifications::tagNameContains)
+                    .reduce(Specification::or)
+                    .orElse(Specification.where(null));  // 태그가 없는 경우 기본 스펙으로 fallback
+
+            spec = spec.and(tagsSpec);
+        }
+        Page<Post> postPage = postRepository.findAll(spec, pageable);
+        return postPage.map(this::convertToDto);
+    }
+
+    private PostResponseForSearchDto convertToDto(Post post) {
+        MemberProfile memberProfile = memberProfileRepository.findByMemberId(post.getMember().getId(), post.getMember().isDeletedYn()).orElseThrow();
+        PostDetail postDetail = postDetailRepository.findByPostId(post.getId()).orElseThrow();
+        PostResponseForSearchDto response =  PostResponseForSearchDto.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .memberProfileId(memberProfile.getId())
+                .memberNickname(memberProfile.getNickName())
+                .memberProfileImage(memberProfile.getProfileImage())
+                .view(post.getView())
+                .likeCount(post.getLikeCount())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .content(postDetail.getContent())
+                .build();
+        return response;
+    }
 
 }
