@@ -3,6 +3,7 @@ package com.evertrip.post.controller;
 import com.evertrip.api.exception.ApplicationException;
 import com.evertrip.api.exception.ErrorCode;
 import com.evertrip.api.response.ApiResponse;
+import com.evertrip.constant.ConstantPool;
 import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
 import com.evertrip.post.dto.request.PostRequestDtoForSearch;
@@ -54,13 +55,15 @@ public class PostController {
 
     @GetMapping("/permit/best30")
     public ResponseEntity<ApiResponse<List<PostResponseForMainDto>>> getPostBest30() {
-        ApiResponse<List<PostResponseForMainDto>> response = ApiResponse.successOf(postService.getPostBest30());
+        Pageable pageable = PageRequest.of(0, ConstantPool.MAIN_POST_SIZE_FOR_SLIDE);
+        ApiResponse<List<PostResponseForMainDto>> response = ApiResponse.successOf(postService.getPostBest30(pageable));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/permit/view30")
     public ResponseEntity<ApiResponse<List<PostResponseForMainDto>>> getPostView30() {
-        ApiResponse<List<PostResponseForMainDto>> response = ApiResponse.successOf(postService.getPostView30());
+        Pageable pageable = PageRequest.of(0, ConstantPool.MAIN_POST_SIZE_FOR_SLIDE);
+        ApiResponse<List<PostResponseForMainDto>> response = ApiResponse.successOf(postService.getPostView30(pageable));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

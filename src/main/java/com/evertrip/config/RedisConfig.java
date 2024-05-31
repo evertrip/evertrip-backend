@@ -5,6 +5,7 @@ import com.evertrip.post.dto.response.PostResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -85,6 +86,11 @@ public class RedisConfig {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.activateDefaultTyping(ptv,ObjectMapper.DefaultTyping.NON_FINAL);
+
+        //localDateTime 역직렬화 세팅
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        //
 
         GenericJackson2JsonRedisSerializer redisSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
