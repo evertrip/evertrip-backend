@@ -303,6 +303,9 @@ public class PostService {
         PostResponseDto postResponseDto = postRepository.getPostDetail(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         cachePost(postResponseDto);
 
+        // Todo: 해당 게시글 관련 게시글_컨텐츠_파일 테이블 정보로 모두 변경해주기
+        // (기존 게시글_컨텐츠_파일들은 delete 해주고)
+
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }
 

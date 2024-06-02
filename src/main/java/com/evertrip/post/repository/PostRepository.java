@@ -39,6 +39,9 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     @Query(value = "update Post p set p.view = :view where p.id = :postId")
     void updateView(@Param("postId") Long postId, @Param("view") Long view);
 
+    @Query("select p from Post p where p.id = :postId and p.member.id = :memberId and p.deletedYn = false")
+    Optional<Post> getPostByPostIdAndMemberId(@Param("memberId") Long memberId, @Param("postId") Long postId);
+
 
 
 

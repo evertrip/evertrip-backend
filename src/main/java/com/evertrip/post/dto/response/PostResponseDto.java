@@ -1,7 +1,9 @@
 package com.evertrip.post.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -23,9 +25,11 @@ public class PostResponseDto {
 
     private Long likeCount;
 
-    private String createdAt;
+    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    private LocalDateTime createdAt;
 
-    private String updatedAt;
+    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    private LocalDateTime updatedAt;
 
     private String content;
 
@@ -37,8 +41,8 @@ public class PostResponseDto {
         this.memberProfileImage = memberProfileImage;
         this.view = view;
         this.likeCount = likeCount;
-        this.createdAt = createdAt.toString().replace("T"," ");
-        this.updatedAt = updatedAt.toString().replace("T"," ");;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.content = content;
     }
 
