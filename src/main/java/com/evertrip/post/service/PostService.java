@@ -233,7 +233,7 @@ public class PostService {
             throw new ApplicationException(ErrorCode.NOT_WRITER);
         }
 
-        // TODO: 게시글 관련 엔티티 삭제 처리(좋아요, 태그, 게시글 로그, 댓글, 파일)
+        // TODO: 게시글 관련 엔티티 삭제 처리(좋아요, 태그, 게시글 이벤트, 댓글, 파일)
 
         // 레디스에 해당 게시글 관련 정보 삭제
         removeCachePost(postId);
