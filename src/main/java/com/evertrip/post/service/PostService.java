@@ -28,6 +28,7 @@ import com.evertrip.post.entity.PostDetail;
 import com.evertrip.post.repository.PostDetailRepository;
 import com.evertrip.post.repository.PostRepository;
 import com.evertrip.post.specifications.PostSpecifications;
+import com.evertrip.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -73,6 +74,8 @@ public class PostService {
     private final PostContentFileRepository postContentFileRepository;
 
     private final RedissonClient redissonClient;
+
+    private final TagService tagService;
 
     public ApiResponse<PostResponseDto> getPostDetailV1(Long postId, Long memberId) {
 
@@ -174,6 +177,8 @@ public class PostService {
         PostResponseDto postResponseDto = postRepository.getPostDetail(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         cachePost(postResponseDto);
 
+        //tag 정보 리셋
+        tagService.getAllTags();
 
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
@@ -219,7 +224,8 @@ public class PostService {
         PostResponseDto postResponseDto = postRepository.getPostDetail(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         cachePost(postResponseDto);
 
-
+        //tag 정보 리셋
+        tagService.getAllTags();
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
     }

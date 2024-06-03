@@ -2,6 +2,7 @@ package com.evertrip.config;
 
 import com.evertrip.constant.ConstantPool;
 import com.evertrip.post.dto.response.PostResponseDto;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
@@ -25,6 +26,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @EnableCaching
@@ -52,15 +54,21 @@ public class RedisConfig {
 
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate() {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return redisTemplate;
     }
 
-
+//    @Bean(name = "objectRedisTemplate")
+//    public RedisTemplate<String, Long> redisTemplateForTag( ) {
+//        RedisTemplate<String, Long> template = new RedisTemplate<>();
+//        template.setConnectionFactory(redisConnectionFactory());
+//        template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
+//        return template;
+//    }
 
 //    @Bean
 //    public CacheManager cacheManager() {
@@ -91,7 +99,6 @@ public class RedisConfig {
 
         //localDateTime 역직렬화 세팅
         objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         //
 
         GenericJackson2JsonRedisSerializer redisSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
