@@ -1,6 +1,7 @@
 package com.evertrip.post.repository;
 
 import com.evertrip.post.dto.request.PostRequestDtoForSearch;
+import com.evertrip.post.dto.response.PostListResponseDto;
 import com.evertrip.post.dto.response.PostResponseDto;
 import com.evertrip.post.dto.response.PostResponseForMainDto;
 import com.evertrip.post.dto.response.PostResponseForSearchDto;
@@ -64,6 +65,23 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
 
     Page<Post> findAll(Specification<Post> spec, Pageable pageable);
+
+    @Query("select new com.evertrip.post.dto.response.PostListResponseDto(mp.member.id, mp.nickName," +
+            " mp.profileImage, p.id, p.profileImage, p.view, p.likeCount, p.title, p.createdAt)" +
+            "from Post p " +
+            "join MemberProfile mp on mp.member.id = p.member.id and mp.deletedYn = false " +
+            "where p.member.id = :memberId and p.deletedYn = false"
+    )
+    Page<PostListResponseDto> findMyPostList(@Param("memberId") Long memberId, Pageable pageable);
+
+    @Query("select new com.evertrip.post.dto.response.PostListResponseDto(mp.member.id, mp.nickName," +
+            " mp.profileImage, p.id, p.profileImage, p.view, p.likeCount, p.title, p.createdAt)" +
+            "from Post p " +
+            "join MemberProfile mp on mp.member.id = p.member.id and mp.deletedYn = false " +
+            "where p.deletedYn = false and p.id in " +
+            "(select pl.postId from PostLike pl where pl.memberId = :memberId)"
+    )
+    Page<PostListResponseDto> findLikePostList(@Param("memberId") Long memberId, Pageable pageable);
 
 
 

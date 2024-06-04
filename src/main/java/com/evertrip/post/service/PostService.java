@@ -19,10 +19,7 @@ import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
 import com.evertrip.post.dto.request.PostRequestDtoForSearch;
-import com.evertrip.post.dto.response.PostResponseDto;
-import com.evertrip.post.dto.response.PostResponseForMainDto;
-import com.evertrip.post.dto.response.PostResponseForSearchDto;
-import com.evertrip.post.dto.response.PostSimpleResponseDto;
+import com.evertrip.post.dto.response.*;
 import com.evertrip.post.entity.Post;
 import com.evertrip.post.entity.PostDetail;
 import com.evertrip.post.repository.PostDetailRepository;
@@ -307,6 +304,22 @@ public class PostService {
         // (기존 게시글_컨텐츠_파일들은 delete 해주고)
 
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
+    }
+
+    /**
+     * 내 게시글 목록 조회
+     */
+    public Page<PostListResponseDto> getMyPostList(Long memberId, Pageable pageable) {
+        Page<PostListResponseDto> myPostList = postRepository.findMyPostList(memberId, pageable);
+        return myPostList;
+    }
+
+    /**
+     * 내가 좋아요한 게시글 목록 조회
+     */
+    public Page<PostListResponseDto> getLikePostList(Long memberId, Pageable pageable) {
+        Page<PostListResponseDto> likePostList = postRepository.findLikePostList(memberId, pageable);
+        return likePostList;
     }
 
     private void cachePost(PostResponseDto dto) {
