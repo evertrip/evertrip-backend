@@ -14,6 +14,7 @@ import com.evertrip.file.repository.PostContentFileRepository;
 import com.evertrip.file.service.FileService;
 import com.evertrip.member.entity.Member;
 import com.evertrip.member.entity.MemberProfile;
+import com.evertrip.member.repository.MemberDetailRepository;
 import com.evertrip.member.repository.MemberProfileRepository;
 import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.post.dto.request.PostPatchDto;
@@ -31,6 +32,7 @@ import com.evertrip.post.specifications.PostSpecifications;
 import com.evertrip.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.RequestBuilder;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.cache.Cache;
@@ -47,6 +49,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -76,6 +79,7 @@ public class PostService {
     private final RedissonClient redissonClient;
 
     private final TagService tagService;
+    private final MemberDetailRepository memberDetailRepository;
 
     public ApiResponse<PostResponseDto> getPostDetailV1(Long postId, Long memberId) {
 
@@ -339,6 +343,28 @@ public class PostService {
         redisForCacheService.deleteSet(ConstantPool.CacheName.VIEWERS+":"+postId);
     }
 
+    //전체 페이지 별로 들고오기
+    public List<PostResponseDto> getAllPosts(Pageable pageable) {
+        List<Post> response = postRepository.findAllByPage(pageable);
+        List<PostResponseDto> posts = response.stream()
+                .map(post -> {return PostResponseDto.builder()
+                        .postId(post.getId())
+                        .title(post.getTitle())
+                        .memberProfileId(post.getMember().getId())
+                        .memberNickname(memberProfileRepository.findByMemberId(post.getMember().getId(), post.getMember().isDeletedYn()).get().getNickName())
+                        .memberProfileImage(memberProfileRepository.findByMemberId(post.getMember().getId(), post.getMember().isDeletedYn()).get().getProfileImage())
+                        .view(post.getView())
+                        .likeCount(post.getLikeCount())
+                        .createdAt(post.getCreatedAt().toString().replace("T"," "))
+                        .updatedAt(post.getUpdatedAt().toString().replace("T"," "))
+                        .content(postRepository.getPostDetail(post.getId()).get().getContent())
+                        .build();
+                })
+                .collect(Collectors.toList());
+        return posts;
+    }
+
+
     @Cacheable(cacheNames = "Best30")
     public List<PostResponseForMainDto> getPostBest30(Pageable pageable) {
         return postRepository.findTop30Posts(pageable);
@@ -386,5 +412,6 @@ public class PostService {
                 .build();
         return response;
     }
+
 
 }

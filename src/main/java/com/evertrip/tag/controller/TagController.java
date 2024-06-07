@@ -20,12 +20,11 @@ import java.util.List;
 public class TagController {
     private final TagService tagService;
 
-    @GetMapping("")
+    @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<Tag>>> getAllTags(){
         ApiResponse<List<Tag>> response = ApiResponse.successOf(tagService.getAllTags());
         return ResponseEntity.ok(response);
     }
-
 
     //최근 게시글 태그 15개 들고오기
     @GetMapping("/recent/{count}")
@@ -34,7 +33,6 @@ public class TagController {
         ApiResponse<List<Tag>> response = ApiResponse.successOf(tagService.getRecentPostTags(pageable));
         return ResponseEntity.ok(response);
     }
-
 
     //다중 태그 작성
     @PostMapping("")

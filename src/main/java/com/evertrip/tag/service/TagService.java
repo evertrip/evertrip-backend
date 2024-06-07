@@ -26,9 +26,6 @@ public class TagService {
     private final PostTagsRepository postTagsRepository;
 
     @Cacheable(cacheNames = "tagList")
-    public List<Tag> getAllTags() {
-        return tagRepository.findAllDistinctNames();
-    }
 
     //다중 태그 작성
     public List<TagSimpleResponseDto> createTags(List<TagNameRequestDto> tagNames){
@@ -52,6 +49,12 @@ public class TagService {
         Tag response =  tagRepository.save(new Tag(tag.getTagId(), tag.getTagName()));
         return new TagSimpleResponseDto(response.getTagId());
     }
+
+    //전체 태그
+    public List<Tag> getAllTags() {
+        return tagRepository.findAllDistinctNames();
+    }
+
 
     //최근 게시글 태그 15개 들고오기
     public List<Tag> getRecentPostTags(Pageable pageable) {
