@@ -10,7 +10,6 @@ pipeline {
         EC2_HOST = credentials('ec2-host') // EC2 서버 호스트 이름 또는 IP
         SPRING_PROFILES_ACTIVE = 'prod'
         AWS_METADATA_DISABLED = 'true'
-        JASYPT_PASSWORD = env.JASYPT_PASSWORD
     }
 
     stages {
@@ -33,10 +32,14 @@ pipeline {
         }
         stage('Build and Test') {
             steps {
+                withEnv([
+                    "JASYPT_PASSWORD"=${env.JASYPT_PASSWORD}
+                ]) {
                     sh '''
                     echo "JASYPT_PASSWORD=${JASYPT_PASSWORD}"
                     ./gradlew clean build -Djasypt.encryptor.password=${JASYPT_PASSWORD} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dcom.amazonaws.sdk.disableEc2Metadata=${AWS_METADATA_DISABLED}
                     '''
+                    }
             }
         }
         stage('Build Docker Image') {
