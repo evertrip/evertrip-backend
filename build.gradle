@@ -75,24 +75,40 @@ tasks.named('asciidoctor') {
 	dependsOn test
 	configurations 'asciidoctorExt'
 	inputs.dir snippetsDir
-	finalizedBy copyDocument
+	inputs.dir file('src/docs/asciidoc')
 	doFirst {
-		delete file('src/main/resources/static/docs')
+		delete file('build/docs/asciidoc')
 	}
+	doLast {
+		println "Generated documentation files:"
+		fileTree('build/docs/asciidoc').visit { println it }
+	}
+	finalizedBy copyDocument
 }
 // spring-rest-docs 추가
 task copyDocument(type: Copy) {
 	dependsOn asciidoctor
 	from file('build/docs/asciidoc')
 	into file('src/main/resources/static/docs')
+	doFirst {
+		println "Current working directory: ${new File('.').absolutePath}"
+		println "Copying documentation files from 'build/docs/asciidoc' to 'src/main/resources/static/docs'"
+		file('src/main/resources/static/docs').mkdirs()
+	}
+	doLast {
+		println "Copied documentation files:"
+		fileTree('src/main/resources/static/docs').visit { println it }
+	}
 }
 
 // spring-rest-docs 추가
+task cleanRestDocs(type: Delete) {
+	delete file('src/main/resources/static/docs')
+}
+
 bootJar {
-	dependsOn asciidoctor
-	doFirst {
-		delete file('static/docs')
-	}
+	dependsOn cleanRestDocs
+	dependsOn copyDocument
 	from("${asciidoctor.outputDir}") {
 		into 'static/docs'
 	}

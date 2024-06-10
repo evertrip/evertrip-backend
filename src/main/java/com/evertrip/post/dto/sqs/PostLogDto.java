@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -25,4 +26,11 @@ public class PostLogDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime  createdAt;
 
+    public PostLogDto(Long memberId, Long postId, LocalDateTime createdAt, ConstantPool.EventType eventType, String eventContent) {
+        this.memberId = memberId;
+        this.postId = postId;
+        this.eventType = eventType;
+        this.eventContent = eventContent;
+        this.createdAt = createdAt;
+    }
 }

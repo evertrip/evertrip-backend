@@ -16,6 +16,8 @@ public enum ErrorCode {
     INVALID_ENUM_VALUE(HttpStatus.BAD_REQUEST, "Invalid enum value"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
 
+    URL_NOT_FOUND(HttpStatus.NOT_FOUND, "The requested URL was not found on this server"),
+
     CRYPT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Crypt error"),
 
     // LOGIN
@@ -49,6 +51,8 @@ public enum ErrorCode {
     INCORRECT_FORMAT_POST(HttpStatus.UNPROCESSABLE_ENTITY, "Post format is Incorrect"),
 
     NOT_WRITER(HttpStatus.FORBIDDEN, "Not Writer of the Post" );
+
+
 
     private HttpStatus status;
     private String message;

@@ -1,6 +1,7 @@
 package com.evertrip.post.repository;
 
 import com.evertrip.post.dto.request.PostRequestDtoForSearch;
+import com.evertrip.post.dto.response.PostListResponseDto;
 import com.evertrip.post.dto.response.PostResponseDto;
 import com.evertrip.post.dto.response.PostResponseForMainDto;
 import com.evertrip.post.dto.response.PostResponseForSearchDto;
@@ -39,6 +40,9 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     @Query(value = "update Post p set p.view = :view where p.id = :postId")
     void updateView(@Param("postId") Long postId, @Param("view") Long view);
 
+    @Query("select p from Post p where p.id = :postId and p.member.id = :memberId and p.deletedYn = false")
+    Optional<Post> getPostByPostIdAndMemberId(@Param("memberId") Long memberId, @Param("postId") Long postId);
+
 
 
 
@@ -65,4 +69,23 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     @Query ("select p from Post p where p.deletedYn = false order by p.createdAt")
     List<Post> findAllByPage(Pageable pageable);
+    @Query("select new com.evertrip.post.dto.response.PostListResponseDto(mp.member.id, mp.nickName," +
+            " mp.profileImage, p.id, p.profileImage, p.view, p.likeCount, p.title, p.createdAt)" +
+            "from Post p " +
+            "join MemberProfile mp on mp.member.id = p.member.id and mp.deletedYn = false " +
+            "where p.member.id = :memberId and p.deletedYn = false"
+    )
+    Page<PostListResponseDto> findMyPostList(@Param("memberId") Long memberId, Pageable pageable);
+
+    @Query("select new com.evertrip.post.dto.response.PostListResponseDto(mp.member.id, mp.nickName," +
+            " mp.profileImage, p.id, p.profileImage, p.view, p.likeCount, p.title, p.createdAt)" +
+            "from Post p " +
+            "join MemberProfile mp on mp.member.id = p.member.id and mp.deletedYn = false " +
+            "where p.deletedYn = false and p.id in " +
+            "(select pl.postId from PostLike pl where pl.memberId = :memberId)"
+    )
+    Page<PostListResponseDto> findLikePostList(@Param("memberId") Long memberId, Pageable pageable);
+
+
+
 }

@@ -20,10 +20,7 @@ import com.evertrip.member.repository.MemberRepository;
 import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
 import com.evertrip.post.dto.request.PostRequestDtoForSearch;
-import com.evertrip.post.dto.response.PostResponseDto;
-import com.evertrip.post.dto.response.PostResponseForMainDto;
-import com.evertrip.post.dto.response.PostResponseForSearchDto;
-import com.evertrip.post.dto.response.PostSimpleResponseDto;
+import com.evertrip.post.dto.response.*;
 import com.evertrip.post.entity.Post;
 import com.evertrip.post.entity.PostDetail;
 import com.evertrip.post.repository.PostDetailRepository;
@@ -243,7 +240,7 @@ public class PostService {
             throw new ApplicationException(ErrorCode.NOT_WRITER);
         }
 
-        // TODO: 게시글 관련 엔티티 삭제 처리(좋아요, 태그, 게시글 로그, 댓글, 파일)
+        // TODO: 게시글 관련 엔티티 삭제 처리(좋아요, 태그, 게시글 이벤트, 댓글, 파일)
 
         // 레디스에 해당 게시글 관련 정보 삭제
         removeCachePost(postId);
@@ -313,7 +310,26 @@ public class PostService {
         PostResponseDto postResponseDto = postRepository.getPostDetail(post.getId()).orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND));
         cachePost(postResponseDto);
 
+        // Todo: 해당 게시글 관련 게시글_컨텐츠_파일 테이블 정보로 모두 변경해주기
+        // (기존 게시글_컨텐츠_파일들은 delete 해주고)
+
         return ApiResponse.successOf(new PostSimpleResponseDto(post.getId()));
+    }
+
+    /**
+     * 내 게시글 목록 조회
+     */
+    public Page<PostListResponseDto> getMyPostList(Long memberId, Pageable pageable) {
+        Page<PostListResponseDto> myPostList = postRepository.findMyPostList(memberId, pageable);
+        return myPostList;
+    }
+
+    /**
+     * 내가 좋아요한 게시글 목록 조회
+     */
+    public Page<PostListResponseDto> getLikePostList(Long memberId, Pageable pageable) {
+        Page<PostListResponseDto> likePostList = postRepository.findLikePostList(memberId, pageable);
+        return likePostList;
     }
 
     private void cachePost(PostResponseDto dto) {
@@ -355,8 +371,8 @@ public class PostService {
                         .memberProfileImage(memberProfileRepository.findByMemberId(post.getMember().getId(), post.getMember().isDeletedYn()).get().getProfileImage())
                         .view(post.getView())
                         .likeCount(post.getLikeCount())
-                        .createdAt(post.getCreatedAt().toString().replace("T"," "))
-                        .updatedAt(post.getUpdatedAt().toString().replace("T"," "))
+                        .createdAt(post.getCreatedAt())
+                        .updatedAt(post.getUpdatedAt())
                         .content(postRepository.getPostDetail(post.getId()).get().getContent())
                         .build();
                 })

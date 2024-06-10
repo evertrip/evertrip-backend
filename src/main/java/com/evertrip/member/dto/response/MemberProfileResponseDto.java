@@ -1,5 +1,6 @@
 package com.evertrip.member.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,9 +15,11 @@ public class MemberProfileResponseDto {
 
     private String description;
 
-    private String createdAt;
+    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    private LocalDateTime createdAt;
 
-    private String updatedAt;
+    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    private LocalDateTime updatedAt;
 
     private String profileImage;
 
@@ -26,8 +29,8 @@ public class MemberProfileResponseDto {
         this.memberId = memberId;
         this.nickName = nickName;
         this.description = description;
-        this.createdAt = createdAt.toString().replace("T", " ");
-        this.updatedAt = updatedAt.toString().replace("T", " ");
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.profileImage = profileImage;
         this.email = email;
     }

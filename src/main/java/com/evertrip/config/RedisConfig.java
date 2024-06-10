@@ -54,21 +54,24 @@ public class RedisConfig {
 
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
 
-//    @Bean(name = "objectRedisTemplate")
-//    public RedisTemplate<String, Long> redisTemplateForTag( ) {
-//        RedisTemplate<String, Long> template = new RedisTemplate<>();
-//        template.setConnectionFactory(redisConnectionFactory());
-//        template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
-//        return template;
+//    @Bean
+//    public RedisTemplate<String, Object> redisTemplate() {
+//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+//        redisTemplate.setConnectionFactory(redisConnectionFactory());
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+//        return redisTemplate;
 //    }
+
+
 
 //    @Bean
 //    public CacheManager cacheManager() {

@@ -7,10 +7,7 @@ import com.evertrip.constant.ConstantPool;
 import com.evertrip.post.dto.request.PostPatchDto;
 import com.evertrip.post.dto.request.PostRequestDto;
 import com.evertrip.post.dto.request.PostRequestDtoForSearch;
-import com.evertrip.post.dto.response.PostResponseDto;
-import com.evertrip.post.dto.response.PostResponseForMainDto;
-import com.evertrip.post.dto.response.PostResponseForSearchDto;
-import com.evertrip.post.dto.response.PostSimpleResponseDto;
+import com.evertrip.post.dto.response.*;
 import com.evertrip.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +24,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+
+import static com.evertrip.constant.ConstantPool.DEFAULT_PAGE_NUM;
+import static com.evertrip.constant.ConstantPool.DEFAULT_PAGE_SIZE;
 
 @RestController
 @RequiredArgsConstructor
@@ -124,6 +126,38 @@ public class PostController {
         Long memberId = Long.parseLong(principal.getName());
         ApiResponse<PostSimpleResponseDto> response = postService.updatePost(memberId, postId, postPatchDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * 내 게시글 목록 조회
+     */
+    @GetMapping("/my-posts")
+    public ResponseEntity getMyPostList(Principal principal, @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE_NUM
+    ,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Long memberId = Long.parseLong(principal.getName());
+
+        // 기본 Sort 설정
+        Sort sort = pageable.getSort();
+        // Pageable 객체 생성
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<PostListResponseDto> myPostList = postService.getMyPostList(memberId, sortedPageable);
+        return new ResponseEntity(ApiResponse.successOf(myPostList), HttpStatus.OK);
+    }
+
+    /**
+     * 내가 좋아요한 게시글 목록 조회
+     */
+    @GetMapping("/like-posts")
+    public ResponseEntity getLikePostList(Principal principal, @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE_NUM
+            ,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Long memberId = Long.parseLong(principal.getName());
+
+        // 기본 Sort 설정
+        Sort sort = pageable.getSort();
+        // Pageable 객체 생성
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<PostListResponseDto> likePostList = postService.getLikePostList(memberId, sortedPageable);
+        return new ResponseEntity(ApiResponse.successOf(likePostList), HttpStatus.OK);
     }
 
 

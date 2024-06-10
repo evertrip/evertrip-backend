@@ -59,7 +59,7 @@ public class MemberController {
         Long memberId = Long.parseLong(principal.getName());
         List<MemberProfileResponseDto> memberProfiles = memberService.getMemberProfiles(memberId);
         log.info("{}",memberProfiles);
-        return new ResponseEntity(ApiResponse.successOf(memberProfiles), HttpStatus.OK);
+        return new ResponseEntity(ApiResponse.successOf(memberProfiles.get(0)), HttpStatus.OK);
     }
 
     /**
@@ -97,15 +97,4 @@ public class MemberController {
         return new ResponseEntity(ApiResponse.successOf(new MemberSimpleResponseDto(memberId)), HttpStatus.OK);
     }
 
-    @GetMapping("/admin/test1")
-    public ResponseEntity test1(Principal principal) {
-        Long memberId = Long.parseLong(principal.getName());
-        return new ResponseEntity(ApiResponse.successOf(memberId), HttpStatus.OK);
-    }
-
-    @GetMapping("/admin/test2")
-    public ResponseEntity test2(Principal principal) {
-        Long memberId = Long.parseLong(principal.getName());
-        return new ResponseEntity(ApiResponse.successOf(memberId), HttpStatus.OK);
-    }
 }

@@ -15,7 +15,7 @@ public class ConstantPool {
 
     // page navigates(페이지 쪽수의 갯수)
     public static final int DEFAULT_PAGE_SIZE = 10;
-    public static final int DEFAULT_PAGE_NUM = 1;
+    public static final int DEFAULT_PAGE_NUM = 0;
 
     // Redis의 조회수을 읽어오기 위한 패턴
     public static final String viewPattern = "views::*";
