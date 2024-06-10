@@ -52,7 +52,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'DOCKER_HUB_CREDENTIALS') {
+                    docker.withRegistry('https://index.docker.io/v1/', '${DOCKER_HUB_CREDENTIALS}') {
                         docker.image('evertrip-image').push('latest')
                     }
                 }
@@ -61,7 +61,7 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 script {
-                    sshagent(['EC2_SSH_KEY']) {
+                    sshagent(['${EC2_SSH_KEY}']) {
                         sh '''
                         ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} '
                         docker pull rlarkddnr1686/evertrip-image:latest &&
