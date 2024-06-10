@@ -7,7 +7,6 @@ pipeline {
         // 각 자격 증명을 Jenkinsfile에서 참조합니다.
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub-jenkins') // Docker Hub 자격 증명 ID
         EC2_SSH_KEY = credentials('ec2-ssh-key-id') // EC2 SSH 키 자격 증명 ID
-        EC2_HOST = credentials('ec2-host') // EC2 서버 호스트 이름 또는 IP
         SPRING_PROFILES_ACTIVE = 'local'
         AWS_METADATA_DISABLED = 'true'
     }
@@ -51,19 +50,22 @@ pipeline {
         }
         stage('Push Docker Image') {
             steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', '${DOCKER_HUB_CREDENTIALS}') {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         docker.image('evertrip-image').push('latest')
                     }
+                }
                 }
             }
         }
         stage('Deploy to EC2') {
             steps {
+            withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
                 script {
                     sshagent(['${EC2_SSH_KEY}']) {
                         sh '''
-                        ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} '
+                        ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_HOST} '
                         docker pull rlarkddnr1686/evertrip-image:latest &&
                         docker stop evertrip-container || true &&
                         docker rm evertrip-container || true &&
@@ -72,6 +74,7 @@ pipeline {
                         '''
                     }
                 }
+               }
             }
         }
     }
