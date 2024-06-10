@@ -33,7 +33,7 @@ pipeline {
         stage('Build and Test') {
             steps {
                 withEnv([
-                    "JASYPT_PASSWORD"=${env.JASYPT_PASSWORD}
+                    "JASYPT_PASSWORD=${env.JASYPT_PASSWORD}"
                 ]) {
                     sh '''
                     echo "JASYPT_PASSWORD=${JASYPT_PASSWORD}"
