@@ -26,10 +26,9 @@ pipeline {
         stage('Test') {
             steps {
                  withCredentials([string(credentialsId: 'jasypt-password-id', variable: 'JASYPT_PASSWORD')]) {
-                        "JASYPT_PASSWORD=${JASYPT_PASSWORD}"
-                         ]) {
                              sh '''
-                             'echo JASYPT_PASSWORD=$JASYPT_PASSWORD'
+                             echo SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+                             echo JASYPT_PASSWORD=$JASYPT_PASSWORD
                              ./gradlew test -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE -Djasypt.encryptor.password=$JASYPT_PASSWORD -Dcom.amazonaws.sdk.disableEc2Metadata=$AWS_METADATA_DISABLED
                              '''
                          }
