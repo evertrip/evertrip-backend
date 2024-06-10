@@ -23,7 +23,13 @@ pipeline {
                 sh 'chmod +x gradlew'
             }
         }
-
+        stage('Redis Check') {
+                    steps {
+                        sh '''
+                        redis-cli -a redis1234 ping
+                        '''
+                    }
+                }
         stage('Test') {
             steps {
                  withCredentials([string(credentialsId: 'jasypt-password-id', variable: 'JASYPT_PASSWORD')]) {    // Jasypt 암호 자격 증명 ID
