@@ -67,7 +67,7 @@ symmetricCrypto:
   secret: ENC(kyj221KeDRO2F0MOiV3FJfgRzctOgpptDy+ZtuqI5iXk6+k0p08dfHHu8kjSwJ6jmF49MNR23EA=)
 jasypt:
   encryptor:
-    password=${JASYPT_PASSWORD}
+    password: ${JASYPT_PASSWORD}
 --- # local 환경
 spring:
   config:
