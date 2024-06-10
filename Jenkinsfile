@@ -29,7 +29,7 @@ pipeline {
                              sh '''
                              echo SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
                              echo JASYPT_PASSWORD=$JASYPT_PASSWORD
-                             ./gradlew test -Djasypt.encryptor.password=$JASYPT_PASSWORD -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE -Dcom.amazonaws.sdk.disableEc2Metadata=$AWS_METADATA_DISABLED
+                             ./gradlew test -Djasypt.encryptor.password=$JASYPT_PASSWORD -Dspring.profiles.active=prod -Dcom.amazonaws.sdk.disableEc2Metadata=$AWS_METADATA_DISABLED
                              '''
                          }
             }
