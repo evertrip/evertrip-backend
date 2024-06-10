@@ -26,7 +26,7 @@ pipeline {
         stage('Test') {
             steps {
                  withCredentials([string(credentialsId: 'jasypt-password-id', variable: 'JASYPT_PASSWORD')]) {
-                        withEnv(["SPRING_PROFILES_ACTIVE=prod", "JASYPT_PASSWORD=${JASYPT_PASSWORD}"]) {
+                        withEnv(["SPRING_PROFILES_ACTIVE=prod", "JASYPT_PASSWORD=${JASYPT_PASSWORD}", "AWS_METADATA_DISABLED=true"]) {
                              sh '''
                              echo SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
                              echo JASYPT_PASSWORD=$JASYPT_PASSWORD
