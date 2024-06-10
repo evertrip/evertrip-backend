@@ -8,7 +8,7 @@ pipeline {
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub-jenkins') // Docker Hub 자격 증명 ID
         EC2_SSH_KEY = credentials('ec2-ssh-key-id') // EC2 SSH 키 자격 증명 ID
         EC2_HOST = credentials('ec2-host') // EC2 서버 호스트 이름 또는 IP
-        SPRING_PROFILES_ACTIVE = 'prod'
+        SPRING_PROFILES_ACTIVE = 'local'
         AWS_METADATA_DISABLED = 'true'
     }
 
