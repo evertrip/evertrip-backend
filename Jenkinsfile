@@ -52,7 +52,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-jenkins', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkins') {
                         docker.image('evertrip-image').push('latest')
                     }
                 }
@@ -63,7 +63,7 @@ pipeline {
             steps {
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
                 script {
-                    sshagent(['${EC2_SSH_KEY}']) {
+                    sshagent(['ec2-ssh-key-id']) {
                         sh '''
                         ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_HOST} '
                         docker pull rlarkddnr1686/evertrip-image:latest &&
