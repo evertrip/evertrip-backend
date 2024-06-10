@@ -53,7 +53,10 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-jenkins', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkins') {
-                        docker.image('evertrip-image').push('latest')
+                         sh '''
+                             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+                             docker push rlarkddnr1686/evertrip-image:latest
+                            '''
                     }
                 }
                 }
