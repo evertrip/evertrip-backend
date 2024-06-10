@@ -1,0 +1,116 @@
+= Connect API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== PostLog 관련 API
+
+=== 게시글 총 조회수 조회
+
+==== 요청
+
+include::{snippets}/post-log-controller-test/gettotalviews_200/http-request.adoc[]
+
+==== 요청 필드
+
+
+==== 응답
+
+include::{snippets}/post-log-controller-test/gettotalviews_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/post-log-controller-test/gettotalviews_200/response-fields.adoc[]
+
+'''
+=== 게시글 최근 방문자 수 조회
+
+==== 요청
+
+include::{snippets}/post-log-controller-test/getnumberofvisitors_200/http-request.adoc[]
+
+==== 요청 필드
+
+
+==== 응답
+
+include::{snippets}/post-log-controller-test/getnumberofvisitors_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/post-log-controller-test/getnumberofvisitors_200/response-fields.adoc[]
+
+'''
+=== 게시글 최근 방문 회원 HISTORY 조회
+
+==== 요청
+
+include::{snippets}/post-log-controller-test/getvisitorshistory_200/http-request.adoc[]
+
+==== 요청 필드
+
+
+==== 응답
+
+include::{snippets}/post-log-controller-test/getvisitorshistory_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/post-log-controller-test/getvisitorshistory_200/response-fields.adoc[]
+
+'''
+=== 게시글 평균 스크롤 깊이 조회
+
+==== 요청
+
+include::{snippets}/post-log-controller-test/getvisitorsscroll_200/http-request.adoc[]
+
+==== 요청 필드
+
+
+==== 응답
+
+include::{snippets}/post-log-controller-test/getvisitorsscroll_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/post-log-controller-test/getvisitorsscroll_200/response-fields.adoc[]
+
+'''
+=== 게시글 평균 페이지 머문 시간 조회
+
+==== 요청
+
+include::{snippets}/post-log-controller-test/getvisitorsstaying_200/http-request.adoc[]
+
+==== 요청 필드
+
+
+==== 응답
+
+include::{snippets}/post-log-controller-test/getvisitorsstaying_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/post-log-controller-test/getvisitorsstaying_200/response-fields.adoc[]
+
+'''
+=== 댓글 작성, 좋아요 클릭 해제 HISTORY 조회
+
+==== 요청
+
+include::{snippets}/post-log-controller-test/gethistory_200/http-request.adoc[]
+
+==== 요청 필드
+
+
+==== 응답
+
+include::{snippets}/post-log-controller-test/gethistory_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/post-log-controller-test/gethistory_200/response-fields.adoc[]
+

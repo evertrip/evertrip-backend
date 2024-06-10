@@ -1,0 +1,81 @@
+= Connect API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== Member 관련 API
+
+=== 로그아웃
+
+==== 요청
+
+include::{snippets}/member-controller-test/removetoken_200/http-request.adoc[]
+
+==== 요청 필드
+
+
+==== 응답
+
+include::{snippets}/member-controller-test/removetoken_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/member-controller-test/removetoken_200/response-fields.adoc[]
+
+'''
+
+=== 회원 프로필 조회
+
+==== 요청
+
+include::{snippets}/member-controller-test/getmemberprofile_200/http-request.adoc[]
+
+==== 요청 필드
+
+
+==== 응답
+
+include::{snippets}/member-controller-test/getmemberprofile_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/member-controller-test/getmemberprofile_200/response-fields.adoc[]
+
+'''
+
+=== 회원 프로필 수정
+
+==== 요청
+
+include::{snippets}/member-controller-test/modifymemberprofile_200/http-request.adoc[]
+
+==== 요청 필드
+include::{snippets}/member-controller-test/modifymemberprofile_200/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/member-controller-test/modifymemberprofile_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/member-controller-test/modifymemberprofile_200/response-fields.adoc[]
+
+'''
+
+=== 회원 탈퇴
+
+==== 요청
+
+include::{snippets}/member-controller-test/updatememberdelete_200/http-request.adoc[]
+
+==== 요청 필드
+
+==== 응답
+
+include::{snippets}/member-controller-test/updatememberdelete_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/member-controller-test/updatememberdelete_200/response-fields.adoc[]
