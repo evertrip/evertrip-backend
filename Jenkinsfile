@@ -15,6 +15,11 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/evertrip/evertrip-backend.git'
             }
         }
+        stage('Set Permissions') {
+            steps {
+                sh 'chmod +x gradlew'
+            }
+        }
 
         stage('Test') {
             steps {
