@@ -30,6 +30,7 @@ pipeline {
                         "JASYPT_PASSWORD=${JASYPT_PASSWORD}",
                         "AWS_METADATA_DISABLED=true"
                          ]) {
+                             sh 'echo JASYPT_PASSWORD=$JASYPT_PASSWORD'
                              sh '''
                              ./gradlew test -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE -Djasypt.encryptor.password=$JASYPT_PASSWORD -Dcom.amazonaws.sdk.disableEc2Metadata=$AWS_METADATA_DISABLED
                              '''
