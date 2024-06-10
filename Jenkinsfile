@@ -32,11 +32,9 @@ pipeline {
         }
         stage('Build and Test') {
             steps {
-                withCredentials([string(credentialsId: 'jasypt-password-id', variable: 'JASYPT_PASSWORD')]) {
                     sh '''
-                    ./gradlew clean build -Djasypt.encryptor.password=${JASYPT_PASSWORD} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dcom.amazonaws.sdk.disableEc2Metadata=${AWS_METADATA_DISABLED}
+                    ./gradlew clean build -Djasypt.encryptor.password=${env.JASYPT_PASSWORD} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dcom.amazonaws.sdk.disableEc2Metadata=${AWS_METADATA_DISABLED}
                     '''
-                }
             }
         }
         stage('Build Docker Image') {
