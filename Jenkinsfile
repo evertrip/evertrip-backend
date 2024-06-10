@@ -55,6 +55,7 @@ pipeline {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkins') {
                          sh '''
                              docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+                             docker tag rlarkddnr1686/evertrip-image:latest rlarkddnr1686/evertrip-image:latest
                              docker push rlarkddnr1686/evertrip-image:latest
                             '''
                     }
