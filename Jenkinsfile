@@ -26,7 +26,7 @@ pipeline {
         stage('Test') {
             steps {
                  withEnv([
-                        "SPRING_PROFILES_ACTIVE=prod",
+                        "SPRING_PROFILES_ACTIVE=local",
                         "JASYPT_PASSWORD=${JASYPT_PASSWORD}",
                         "AWS_METADATA_DISABLED=true"
                          ]) {
