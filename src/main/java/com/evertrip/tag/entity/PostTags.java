@@ -25,8 +25,6 @@ public class PostTags extends BaseEntity {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-
-
     @Column(name="deleted_yn")
     private boolean deletedYn;
 }
