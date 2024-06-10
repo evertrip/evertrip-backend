@@ -69,16 +69,17 @@ pipeline {
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
                 script {
                     sshagent(['ec2-ssh-key-id']) {
-                        sh '''
-                        ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_HOST} '
-                        docker pull rlarkddnr1686/evertrip-image:latest &&
-                        docker stop evertrip-container || true &&
-                        docker rm evertrip-container || true &&
-                        docker run -d --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
-                        '
-                        '''
+                                    sh '''
+                                    #!/bin/bash
+                                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} '
+                                    docker pull rlarkddnr1686/evertrip-image:latest &&
+                                    docker stop evertrip-container || true &&
+                                    docker rm evertrip-container || true &&
+                                    docker run -d --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
+                                    '
+                                    '''
+                                }
                     }
-                }
                }
             }
         }
