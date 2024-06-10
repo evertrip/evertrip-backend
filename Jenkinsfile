@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+    tools {
+        jdk 'JDK'
+    }
     environment {
         // 각 자격 증명을 Jenkinsfile에서 참조합니다.
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub-jenkins') // Docker Hub 자격 증명 ID
