@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -186,8 +185,10 @@ class PostLogControllerTest extends RestDocsTestSupport {
                 .andExpect(jsonPath("$.content[6].period").value("202404"))
                 .andExpect(jsonPath("$.content[7].visitors").value(3L))
                 .andExpect(jsonPath("$.content[7].period").value("202405"))
-                .andExpect(jsonPath("$.content[8].visitors").value(18L))
-                .andExpect(jsonPath("$.content[8].period").value("total"))
+                .andExpect(jsonPath("$.content[8].visitors").value(3L))
+                .andExpect(jsonPath("$.content[8].period").value("202406"))
+                .andExpect(jsonPath("$.content[9].visitors").value(18L))
+                .andExpect(jsonPath("$.content[9].period").value("total"))
                 .andDo(restDocs.document(
                         requestHeaders( // 요청 헤더 추가
                                 headerWithName("Authorization")

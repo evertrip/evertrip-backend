@@ -56,6 +56,12 @@ public class PostController {
         return ResponseEntity.ok(ApiResponse.successOf(postDetail));
     }
 
+    @GetMapping("/permit/main/{page}")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getAllPosts(@PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 12);
+        List<PostResponseDto>  response = postService.getAllPosts(pageable);
+        return ResponseEntity.ok(ApiResponse.successOf(response));
+    }
 
     @GetMapping("/permit/best30")
     public ResponseEntity<ApiResponse<List<PostResponseForMainDto>>> getPostBest30() {

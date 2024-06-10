@@ -46,6 +46,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
 
 
+
     @Query("SELECT new com.evertrip.post.dto.response.PostResponseForMainDto(p.id, p.member.id, mp.nickName, p.title, p.createdAt, p.view, p.profileImage, pd.content, p.likeCount) " +
             "FROM Post p " +
             "JOIN MemberProfile mp ON p.member.id = mp.id " +
@@ -66,6 +67,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     Page<Post> findAll(Specification<Post> spec, Pageable pageable);
 
+    @Query ("select p from Post p where p.deletedYn = false order by p.createdAt")
+    List<Post> findAllByPage(Pageable pageable);
     @Query("select new com.evertrip.post.dto.response.PostListResponseDto(mp.member.id, mp.nickName," +
             " mp.profileImage, p.id, p.profileImage, p.view, p.likeCount, p.title, p.createdAt)" +
             "from Post p " +
