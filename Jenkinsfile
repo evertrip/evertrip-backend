@@ -44,7 +44,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build('evertrip-image')
+                    def image = docker.build('rlarkddnr1686/evertrip-image:latest')
+                    image.tag('latest')
                 }
             }
         }
