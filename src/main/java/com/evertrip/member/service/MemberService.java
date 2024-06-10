@@ -124,7 +124,7 @@ public class MemberService {
         profile.softDelete();
         detail.softDelete();
 
-        // Todo: 회원이 등록한 게시글 및 게시글 관련 정보 삭제
+        // TODO: 회원이 등록한 게시글 및 게시글 관련 정보 삭제
 
         // Refresh 토큰을 Redis에서 제거하는 작업
         try {

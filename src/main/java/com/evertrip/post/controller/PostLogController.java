@@ -35,7 +35,7 @@ public class PostLogController {
     }
 
     /**
-     * 게시글 최근 방문자 수
+     * 게시글 최근 방문자 수 조회
      */
     @GetMapping("/visitors")
     public ResponseEntity getNumberOfVisitors(@PathVariable("post-id") Long postId) {
@@ -44,7 +44,7 @@ public class PostLogController {
     }
 
     /**
-     * 게시글 최근 방문 회원 HISTORY
+     * 게시글 최근 방문 회원 HISTORY 조회
      */
     @GetMapping("/visitors/history")
     public ResponseEntity getVisitorsHistory(@PathVariable("post-id") Long postId) {
@@ -53,7 +53,7 @@ public class PostLogController {
     }
 
     /**
-     * 게시글 평균 스크롤 깊이
+     * 게시글 평균 스크롤 깊이 조회
      */
     @GetMapping("/scroll")
     public ResponseEntity getVisitorsScroll(@PathVariable("post-id") Long postId) {
@@ -62,7 +62,7 @@ public class PostLogController {
     }
 
     /**
-     * 게시글 평균 페이지 머문 시간
+     * 게시글 평균 페이지 머문 시간 조회
      */
     @GetMapping("/staying")
     public ResponseEntity getVisitorsStaying(@PathVariable("post-id") Long postId) {
@@ -71,7 +71,7 @@ public class PostLogController {
     }
 
     /**
-     * 댓글 작성, 좋아요 클릭 해제 HISTORY
+     * 댓글 작성, 좋아요 클릭 해제 HISTORY 조회
      */
     @GetMapping("/history")
     public ResponseEntity getHistory(@PathVariable("post-id") Long postId) {

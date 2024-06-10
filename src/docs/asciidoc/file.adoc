@@ -1,0 +1,47 @@
+= Connect API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== File 관련 API
+
+=== 파일 목록 조회
+
+==== 요청
+
+include::{snippets}/file-controller-test/getfilelist_200/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/file-controller-test/getfilelist_200/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/file-controller-test/getfilelist_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/file-controller-test/getfilelist_200/response-fields.adoc[]
+
+'''
+
+=== 파일 등록
+
+==== 요청
+
+include::{snippets}/file-controller-test/postfile_200/http-request.adoc[]
+
+==== 요청 파츠
+
+include::{snippets}/file-controller-test/postfile_200/request-parts.adoc[]
+
+
+==== 응답
+
+include::{snippets}/file-controller-test/postfile_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/file-controller-test/postfile_200/response-fields.adoc[]

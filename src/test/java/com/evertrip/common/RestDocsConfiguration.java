@@ -16,6 +16,7 @@ public class RestDocsConfiguration {
                 "{class-name}/{method-name}",  // 문서 이름 설정
                 preprocessRequest(  // 공통 헤더 설정
                         modifyHeaders()
+                                .add("Authorization", "Bearer your token")
                                 .remove("Content-Length")
                                 .remove("Host"),
                         prettyPrint()),  // pretty json 적용

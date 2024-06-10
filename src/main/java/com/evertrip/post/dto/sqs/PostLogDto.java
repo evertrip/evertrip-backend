@@ -26,4 +26,11 @@ public class PostLogDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime  createdAt;
 
+    public PostLogDto(Long memberId, Long postId, LocalDateTime createdAt, ConstantPool.EventType eventType, String eventContent) {
+        this.memberId = memberId;
+        this.postId = postId;
+        this.eventType = eventType;
+        this.eventContent = eventContent;
+        this.createdAt = createdAt;
+    }
 }
