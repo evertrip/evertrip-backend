@@ -24,36 +24,21 @@ pipeline {
             }
         }
         stage('Redis Check') {
-                    steps {
-                        sh '''
-                        redis-cli -a redis1234 ping
-                        '''
-                    }
-                }
-        stage('Test') {
             steps {
-                 withCredentials([string(credentialsId: 'jasypt-password-id', variable: 'JASYPT_PASSWORD')]) {    // Jasypt 암호 자격 증명 ID
-                             sh '''
-                             ./gradlew test -Djasypt.encryptor.password=${JASYPT_PASSWORD} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dcom.amazonaws.sdk.disableEc2Metadata=${AWS_METADATA_DISABLED}
-                             '''
-                 }
+                sh '''
+                redis-cli -a redis1234 ping
+                '''
             }
         }
-
-        stage('Build') {
-                    steps {
-                        withEnv([
-                            "SPRING_PROFILES_ACTIVE=prod",
-                            "JASYPT_PASSWORD=${JASYPT_PASSWORD}",
-                            "AWS_METADATA_DISABLED=true"
-                        ]) {
-                            sh '''
-                            ./gradlew build -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE -Djasypt.encryptor.password=$JASYPT_PASSWORD -Dcom.amazonaws.sdk.disableEc2Metadata=$AWS_METADATA_DISABLED
-                            '''
-                        }
-                    }
+        stage('Build and Test') {
+            steps {
+                withCredentials([string(credentialsId: 'jasypt-password-id', variable: 'JASYPT_PASSWORD')]) {
+                    sh '''
+                    ./gradlew clean build -Djasypt.encryptor.password=${JASYPT_PASSWORD} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dcom.amazonaws.sdk.disableEc2Metadata=${AWS_METADATA_DISABLED}
+                    '''
                 }
-
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
@@ -61,7 +46,6 @@ pipeline {
                 }
             }
         }
-
         stage('Push Docker Image') {
             steps {
                 script {
@@ -71,19 +55,18 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy to EC2') {
             steps {
                 script {
                     sshagent(['EC2_SSH_KEY']) {
-                        sh """
+                        sh '''
                         ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} '
                         docker pull rlarkddnr1686/evertrip-image:latest &&
                         docker stop evertrip-container || true &&
                         docker rm evertrip-container || true &&
                         docker run -d --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
                         '
-                        """
+                        '''
                     }
                 }
             }
