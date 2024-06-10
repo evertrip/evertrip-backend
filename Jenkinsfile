@@ -6,9 +6,10 @@ pipeline {
     environment {
         // 각 자격 증명을 Jenkinsfile에서 참조합니다.
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub-jenkins') // Docker Hub 자격 증명 ID
-        JASYPT_PASSWORD = credentials('jasypt-password-id') // Jasypt 암호 자격 증명 ID
         EC2_SSH_KEY = credentials('ec2-ssh-key-id') // EC2 SSH 키 자격 증명 ID
         EC2_HOST = credentials('ec2-host') // EC2 서버 호스트 이름 또는 IP
+        SPRING_PROFILES_ACTIVE = 'prod'
+        AWS_METADATA_DISABLED = 'true'
     }
 
     stages {
@@ -25,14 +26,10 @@ pipeline {
 
         stage('Test') {
             steps {
-                 withCredentials([string(credentialsId: 'jasypt-password-id', variable: 'JASYPT_PASSWORD')]) {
-                        withEnv(["SPRING_PROFILES_ACTIVE=prod", "JASYPT_PASSWORD=${JASYPT_PASSWORD}", "AWS_METADATA_DISABLED=true"]) {
+                 withCredentials([string(credentialsId: 'jasypt-password-id', variable: 'JASYPT_PASSWORD')]) {    // Jasypt 암호 자격 증명 ID
                              sh '''
-                             echo SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
-                             echo JASYPT_PASSWORD=$JASYPT_PASSWORD
-                             ./gradlew test -Djasypt.encryptor.password=$JASYPT_PASSWORD -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE -Dcom.amazonaws.sdk.disableEc2Metadata=$AWS_METADATA_DISABLED
+                             ./gradlew test -Djasypt.encryptor.password=${JASYPT_PASSWORD} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dcom.amazonaws.sdk.disableEc2Metadata=${AWS_METADATA_DISABLED}
                              '''
-                         }
                  }
             }
         }
