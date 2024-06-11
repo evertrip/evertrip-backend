@@ -6,6 +6,7 @@ pipeline {
     environment {
         SPRING_PROFILES_ACTIVE = 'local'
         AWS_METADATA_DISABLED = 'true'
+        JASYPT_PASSWORD = "${JASYPT_PASSWORD}"
     }
 
     stages {
