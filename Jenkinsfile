@@ -68,12 +68,13 @@ pipeline {
                     sshagent(['ec2-ssh-key-id']) {
                                     sh '''
                                     #!/bin/bash
-                                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
+                                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} << EOF
+                                    JASYPT_PASSWORD=${JASYPT_PASSWORD}
                                     docker pull rlarkddnr1686/evertrip-image:latest &&
                                     docker stop evertrip-container || true &&
                                     docker rm evertrip-container || true &&
-                                    echo "Starting container with JASYPT_PASSWORD=${JASYPT_PASSWORD}" &&
-                                    docker run -d --network host -p 8080:8080 --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
+                                    echo "Starting container with JASYPT_PASSWORD=\${JASYPT_PASSWORD}" &&
+                                    docker run -d --network host -p 8080:8080 --name evertrip-container -e JASYPT_PASSWORD=\${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
                                     '
                                     '''
                                 }
