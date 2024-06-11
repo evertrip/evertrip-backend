@@ -72,7 +72,7 @@ pipeline {
                                     docker pull rlarkddnr1686/evertrip-image:latest &&
                                     docker stop evertrip-container || true &&
                                     docker rm evertrip-container || true &&
-                                    docker run -d --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
+                                    docker run -d -p 8080:8080 --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
                                     '
                                     '''
                                 }
