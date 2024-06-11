@@ -9,4 +9,4 @@ COPY ${JAR_FILE} /app/app.jar
 
 
 # 환경 변수를 사용하여 애플리케이션 실행
-ENTRYPOINT ["sh", "-c", "java -jar -Djasypt.encryptor.password=$JASYPT_PASSWORD_ENV -DSPRING_PROFILES_ACTIVE=prod -Dcom.amazonaws.sdk.disableEc2Metadata=true /app/app.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar -Djasypt.encryptor.password=$JASYPT_PASSWORD -DSPRING_PROFILES_ACTIVE=prod -Dcom.amazonaws.sdk.disableEc2Metadata=true /app/app.jar"]
