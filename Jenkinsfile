@@ -28,12 +28,11 @@ pipeline {
         }
         stage('Build and Test') {
             steps {
-                    {
                     sh '''
                     echo "JASYPT_PASSWORD=${JASYPT_PASSWORD}"
                     ./gradlew clean build --info --stacktrace -Djasypt.encryptor.password=${JASYPT_PASSWORD} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dcom.amazonaws.sdk.disableEc2Metadata=${AWS_METADATA_DISABLED}
                     '''
-                    }
+
             }
         }
 
