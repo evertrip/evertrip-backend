@@ -75,7 +75,6 @@ pipeline {
                                     docker rm evertrip-container || true &&
                                     echo "Starting container with JASYPT_PASSWORD=\${JASYPT_PASSWORD}" &&
                                     docker run -d --network host -p 8080:8080 --name evertrip-container -e JASYPT_PASSWORD=\${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
-                                    '
                                     '''
                                 }
                     }
