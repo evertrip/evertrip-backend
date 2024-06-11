@@ -4,9 +4,6 @@ pipeline {
         jdk 'JDK'
     }
     environment {
-        // 각 자격 증명을 Jenkinsfile에서 참조합니다.
-        DOCKER_HUB_CREDENTIALS = credentials('dockerhub-jenkins') // Docker Hub 자격 증명 ID
-        EC2_SSH_KEY = credentials('ec2-ssh-key-id') // EC2 SSH 키 자격 증명 ID
         SPRING_PROFILES_ACTIVE = 'local'
         AWS_METADATA_DISABLED = 'true'
     }
@@ -71,7 +68,7 @@ pipeline {
                     sshagent(['ec2-ssh-key-id']) {
                                     sh '''
                                     #!/bin/bash
-                                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} '
+                                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
                                     docker pull rlarkddnr1686/evertrip-image:latest &&
                                     docker stop evertrip-container || true &&
                                     docker rm evertrip-container || true &&
