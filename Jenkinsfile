@@ -28,9 +28,7 @@ pipeline {
         }
         stage('Build and Test') {
             steps {
-                withEnv([
-                    "JASYPT_PASSWORD=${env.JASYPT_PASSWORD}"
-                ]) {
+                    {
                     sh '''
                     echo "JASYPT_PASSWORD=${JASYPT_PASSWORD}"
                     ./gradlew clean build --info --stacktrace -Djasypt.encryptor.password=${JASYPT_PASSWORD} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dcom.amazonaws.sdk.disableEc2Metadata=${AWS_METADATA_DISABLED}
@@ -74,7 +72,7 @@ pipeline {
                                     docker pull rlarkddnr1686/evertrip-image:latest &&
                                     docker stop evertrip-container || true &&
                                     docker rm evertrip-container || true &&
-                                    docker run -d -p 8080:8080 --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
+                                    docker run -d --network host -p 8080:8080 --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
                                     '
                                     '''
                                 }
