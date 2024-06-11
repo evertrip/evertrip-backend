@@ -46,6 +46,7 @@ pipeline {
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-jenkins', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
@@ -69,10 +70,10 @@ pipeline {
                                     sh '''
                                     #!/bin/bash
                                     ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
-                                    docker pull rlarkddnr1686/evertrip-image:latest &&
-                                    docker stop evertrip-container || true &&
-                                    docker rm evertrip-container || true &&
-                                    docker run -d -p 8080:8080 --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
+                                    sudo docker ps -q --filter "name=evertrip-container" | grep -q . && sudo docker stop evertrip-container && sudo docker rm evertrip-container || true
+                                    sudo docker pull rlarkddnr1686/evertrip-image:latest
+                                    sudo docker run -d -p 8080:8080 --name evertrip-container -e JASYPT_PASSWORD=${JASYPT_PASSWORD} -e SPRING_PROFILES_ACTIVE=prod -e DISABLE_EC2_METADATA=true rlarkddnr1686/evertrip-image:latest
+                                    sudo docker image prune -f
                                     '
                                     '''
                                 }
