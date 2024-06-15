@@ -4,7 +4,7 @@ pipeline {
         jdk 'JDK'
     }
     environment {
-        SPRING_PROFILES_ACTIVE = 'local'
+        SPRING_PROFILES_ACTIVE = 'prod'
         AWS_METADATA_DISABLED = 'true'
         JASYPT_PASSWORD = "${JASYPT_PASSWORD}"
     }
@@ -41,7 +41,6 @@ pipeline {
             steps {
                 script {
                     def image = docker.build('rlarkddnr1686/evertrip-image:latest')
-                    image.tag('latest')
                 }
             }
         }

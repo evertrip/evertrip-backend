@@ -108,7 +108,7 @@ class FileControllerTest extends RestDocsTestSupport {
     public void getfilelist_200() throws Exception {
         // given
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        FileRequestDto dto = FileRequestDto.create(TableName.MEMBER_PROFILE,2L);
+        FileRequestDto dto = FileRequestDto.create(TableName.MEMBER_PROFILE,1L);
 
         // 요청 메시지 바디에 JSON 형태로 넣어주기 위해 객체 직렬화 합니다.
         String fileRequestDto = objectMapper.writeValueAsString(dto);

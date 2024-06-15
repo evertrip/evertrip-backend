@@ -65,7 +65,6 @@ public class NaverOauth implements SocialOauth{
                 .map(x->x.getKey()+"="+x.getValue())
                 .collect(Collectors.joining("&"));
         String redirectURL=NAVER_SNS_LOGIN_URL+"?"+parameterString;
-        System.out.println("redirectURL = " + redirectURL);
 
         return redirectURL;
     }

@@ -102,7 +102,7 @@ class MemberControllerTest extends RestDocsTestSupport {
 
         // when
         // pk가 2L인 사용자의 프로필을 조회합니다. 헤더의 토큰은 해당 pk의 사용자 토큰입니다.
-        List<MemberProfileResponseDto> memberProfiles = memberProfileRepository.findMemberProfiles(2L, false);
+        List<MemberProfileResponseDto> memberProfiles = memberProfileRepository.findMemberProfiles(1L, false);
         MemberProfileResponseDto memberProfile = memberProfiles.get(0);
 
 
@@ -221,7 +221,7 @@ class MemberControllerTest extends RestDocsTestSupport {
                 ));
 
         // 변경된 이후의 회원 프로필을 DB에서 뽑아옵니다.
-        MemberProfileResponseDto modifyProfile = memberProfileRepository.findMemberProfiles(2L, false).get(0);
+        MemberProfileResponseDto modifyProfile = memberProfileRepository.findMemberProfiles(1L, false).get(0);
 
 
         // 비교하기
@@ -236,7 +236,6 @@ class MemberControllerTest extends RestDocsTestSupport {
         // given
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-        System.out.println("getUserName() :" + userDetails.getUsername());
         // Mock 객체 설정 - redisService 목 객체에 getRefreshToken() 메소드를 호출할 시 Null 값을 반환하도록 설정
         Mockito.when(redisService.getRefreshToken(Mockito.anyString())).thenReturn(null);
 
@@ -246,7 +245,7 @@ class MemberControllerTest extends RestDocsTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.errorResponse").value(nullValue()))
-                .andExpect(jsonPath("$.content.memberId").value(2L))
+                .andExpect(jsonPath("$.content.memberId").value(1L))
                 .andDo(restDocs.document(
                         requestHeaders( // 요청 헤더 추가
                                 headerWithName("Authorization")
@@ -283,7 +282,7 @@ class MemberControllerTest extends RestDocsTestSupport {
         // Mock 객체 설정 - redisService 목 객체에 getRefreshToken() 메소드를 호출할 시 Null 값을 반환하도록 설정
         Mockito.when(redisService.getRefreshToken(anyString())).thenReturn(null);
 
-        Member member = memberRepository.findById(2L).get();
+        Member member = memberRepository.findById(1L).get();
 
 
         // when
