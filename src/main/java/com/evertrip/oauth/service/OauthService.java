@@ -148,10 +148,10 @@ public class OauthService {
 //                response.addCookie(refreshCookie);
 
                 // SameSite 속성을 포함하여 Set-Cookie 헤더 직접 설정
-                String jwtCookieHeader = String.format("%s=%s; Path=%s;  SameSite=None; Domain=%s",
+                String jwtCookieHeader = String.format("%s=%s; Path=%s; SameSite=None; Domain=%s",
                         AUTHORIZATION_HEADER, jwt, "/", "localhost");
 
-                String refreshCookieHeader = String.format("%s=%s; Path=%s;  SameSite=None; Domain=%s",
+                String refreshCookieHeader = String.format("%s=%s; Path=%s; SameSite=None; Domain=%s",
                         REFRESH_HEADER, refresh, "/", "localhost");
 
                 // Set-Cookie 헤더를 직접 설정
