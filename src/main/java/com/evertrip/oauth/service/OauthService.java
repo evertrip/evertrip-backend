@@ -3,6 +3,7 @@ package com.evertrip.oauth.service;
 import com.evertrip.api.exception.ApplicationException;
 import com.evertrip.api.exception.ErrorCode;
 import com.evertrip.constant.ConstantPool;
+import com.evertrip.member.dto.response.MemberSimpleResponseDto;
 import com.evertrip.member.entity.Member;
 import com.evertrip.member.entity.MemberDetail;
 import com.evertrip.member.entity.MemberProfile;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 import static com.evertrip.api.exception.ErrorCode.INVALID_SOCIAL_LOGIN_TYPE;
 import static com.evertrip.constant.ConstantPool.AUTHORIZATION_HEADER;
@@ -69,22 +71,8 @@ public class OauthService {
     private final RoleRepository roleRepository;
 
 
-
-    public void request(ConstantPool.SocialLoginType socialLoginType) throws IOException {
-        String redirectURL = switch (socialLoginType) {
-            case NAVER -> {
-                yield naverOauth.getOauthRedirectURL();
-            }
-            default -> {
-                throw new ApplicationException(INVALID_SOCIAL_LOGIN_TYPE);
-            }
-        };
-
-        response.sendRedirect(redirectURL);
-    }
-
     @Transactional
-    public void oauthLogin(ConstantPool.SocialLoginType socialLoginType, String code, HttpHeaders httpHeaders , HttpServletRequest request) throws IOException {
+    public MemberSimpleResponseDto oauthLogin(ConstantPool.SocialLoginType socialLoginType, String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
         switch (socialLoginType) {
             case NAVER -> {
                 // 네이버로 일회성 코드를 보내 액세스 토큰이 담긴 응답객체를 받아온다
@@ -98,11 +86,13 @@ public class OauthService {
 
                 // DB에 회원 이메일이 등록 되어있는지 확인 후 있으면 회원가입 처리 및 토큰 발급, 없으면 그냥 토큰 발급
                 // 회원가입 처리
-                if (memberRepository.findByEmail(symmetricCrypto.encrypt(naverUser.getEmail())).isEmpty()) {
+                Member findMember;
+                Optional<Member> memberOptional = memberRepository.findByEmail(symmetricCrypto.encrypt(naverUser.getEmail()));
+                if (memberOptional.isEmpty()) {
                     log.info("신규 회원");
                     Role role = roleRepository.findByRoleName(Role.RoleName.USER).orElseThrow(() -> new ApplicationException(ErrorCode.AUTHORITY_NOT_FOUND));
                     Member member = new Member(symmetricCrypto.encrypt(naverUser.getEmail()),role);
-                    Member findMember = memberRepository.save(member);
+                    findMember = memberRepository.save(member);
 
                     MemberProfile memberProfile = new MemberProfile(member, naverUser.getName());
                     memberProfileRepository.save(memberProfile);
@@ -118,6 +108,8 @@ public class OauthService {
                     log.info("회원 이메일(DB 복호화) : {}" ,symmetricCrypto.decrypt(findMember.getEmail()));
                     log.info("회원 전화번호(DB 암호화) : {}" ,memberDetail.getPhone());
                     log.info("회원 전화번호(DB 복호화) : {}" ,symmetricCrypto.decrypt(memberDetail.getPhone()));
+                } else {
+                    findMember = memberOptional.get();
                 }
 
                 log.info("해당 회원 저장 여부 : {}",memberRepository.findByEmail(symmetricCrypto.encrypt(naverUser.getEmail())).get().getEmail());
@@ -137,29 +129,8 @@ public class OauthService {
                 String jwt = tokenProvider.createToken(authentication);
                 String refresh = refreshTokenProvider.createToken(authentication, ipAddress);
 
-//                Cookie jwtCookie = new Cookie(AUTHORIZATION_HEADER,  jwt);
-//                jwtCookie.setPath("/");
-//                jwtCookie.setDomain("localhost");
-//                response.addCookie(jwtCookie);
-//
-//                Cookie refreshCookie = new Cookie(REFRESH_HEADER,  refresh);
-//                refreshCookie.setPath("/");
-//                refreshCookie.setDomain("localhost");
-//                response.addCookie(refreshCookie);
-
-                // SameSite 속성을 포함하여 Set-Cookie 헤더 직접 설정
-                String jwtCookieHeader = String.format("%s=%s; Path=%s; SameSite=None; Domain=%s",
-                        AUTHORIZATION_HEADER, jwt, "/", "localhost");
-
-                String refreshCookieHeader = String.format("%s=%s; Path=%s; SameSite=None; Domain=%s",
-                        REFRESH_HEADER, refresh, "/", "localhost");
-
-                // Set-Cookie 헤더를 직접 설정
-                response.setHeader("Set-Cookie", jwtCookieHeader);
-                response.addHeader("Set-Cookie", refreshCookieHeader);
-
-
-
+                response.addHeader(AUTHORIZATION_HEADER, jwt);
+                response.addHeader(REFRESH_HEADER, refresh);
 
                 // REDIS에 Refresh Token 저장
                 try {
@@ -169,7 +140,8 @@ public class OauthService {
                 } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeyException e) {
                     throw new ApplicationException(ErrorCode.CRYPT_ERROR);
                 }
-                // ----------------------------------------------------------
+
+                return new MemberSimpleResponseDto(findMember.getId());
 
 
             }
