@@ -147,6 +147,16 @@ public class OauthService {
                 refreshCookie.setDomain("localhost");
                 response.addCookie(refreshCookie);
 
+                // SameSite 속성을 포함하여 Set-Cookie 헤더 직접 설정
+                String jwtCookieHeader = String.format("%s=%s; Path=%s; HttpOnly; Secure; SameSite=None; Domain=%s",
+                        jwtCookie.getName(), jwtCookie.getValue(), jwtCookie.getPath(), jwtCookie.getDomain());
+
+                String refreshCookieHeader = String.format("%s=%s; Path=%s; HttpOnly; Secure; SameSite=None; Domain=%s",
+                        refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getPath(), refreshCookie.getDomain());
+
+                response.setHeader("Set-Cookie", jwtCookieHeader);
+                response.addHeader("Set-Cookie", refreshCookieHeader);
+
 
 
 
