@@ -31,7 +31,7 @@ public class BatchScheduler {
 //        jobLauncher.run(sqsBatchJob, new JobParametersBuilder()
 //                .addLong("uniqueness", System.nanoTime()).toJobParameters());
 //    }
-
+//
 //    @Scheduled(cron = "0 */15 * * * ?") // 매 15분마다 실행
 //    public void runViewUpdateJob() throws JobExecutionException {
 //        log.info("View Update 스케줄링 동작");

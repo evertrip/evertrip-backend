@@ -139,22 +139,16 @@ public class OauthService {
 
                 Cookie jwtCookie = new Cookie(AUTHORIZATION_HEADER,  jwt);
                 jwtCookie.setPath("/");
+                jwtCookie.setDomain("localhost");
                 response.addCookie(jwtCookie);
 
                 Cookie refreshCookie = new Cookie(REFRESH_HEADER,  refresh);
                 refreshCookie.setPath("/");
+                refreshCookie.setDomain("localhost");
                 response.addCookie(refreshCookie);
 
-                // SameSite 속성을 추가하여 Set-Cookie 헤더를 재설정
-                String jwtCookieHeader = String.format("%s=%s; Path=%s; HttpOnly; Secure; SameSite=None",
-                        jwtCookie.getName(), jwtCookie.getValue(), jwtCookie.getPath());
 
-                String refreshCookieHeader = String.format("%s=%s; Path=%s; HttpOnly; Secure; SameSite=None",
-                        refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getPath());
 
-                // 기존 헤더에 추가하는 방식으로 재설정
-                response.addHeader("Set-Cookie", jwtCookieHeader);
-                response.addHeader("Set-Cookie", refreshCookieHeader);
 
                 // REDIS에 Refresh Token 저장
                 try {
