@@ -22,7 +22,7 @@ public class ConstantPool {
 
 
     // 프론트 서버 주소
-    public static final String FRONT_SERVER_HOST = "*";
+    public static final String FRONT_SERVER_HOST = "FRONT_SERVER_HOST";
     public static final String FRONT_LOCAL_HOST = "http://localhost:3000";
 
 
