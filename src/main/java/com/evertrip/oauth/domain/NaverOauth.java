@@ -21,20 +21,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class NaverOauth implements SocialOauth{
 
-    @Value("${spring.security.oauth2.naver.authorization}")
-    private String NAVER_SNS_LOGIN_URL;
 
     @Value("${spring.security.oauth2.naver.client-id}")
     private String NAVER_SNS_CLIENT_ID;
 
-    @Value("${spring.security.oauth2.naver.redirect-url}")
-    private String NAVER_SNS_CALLBACK_URL;
-
     @Value("${spring.security.oauth2.naver.client-secret}")
     private String NAVER_SNS_CLIENT_SECRET;
 
-    @Value("${spring.security.oauth2.naver.scope}")
-    private String NAVER_DATA_ACCESS_SCOPE;
 
     @Value("${spring.security.oauth2.naver.token-uri}")
     private String NAVER_TOKEN_URI;
@@ -50,24 +43,6 @@ public class NaverOauth implements SocialOauth{
     private final RestTemplate restTemplate;
 
 
-
-    @Override
-    public String getOauthRedirectURL() {
-
-        Map<String,Object> params=new HashMap<>();
-        params.put("scope",NAVER_DATA_ACCESS_SCOPE);
-        params.put("response_type","code");
-        params.put("client_id",NAVER_SNS_CLIENT_ID);
-        params.put("redirect_uri",NAVER_SNS_CALLBACK_URL);
-
-        //parameter를 형식에 맞춰 구성해주는 함수
-        String parameterString=params.entrySet().stream()
-                .map(x->x.getKey()+"="+x.getValue())
-                .collect(Collectors.joining("&"));
-        String redirectURL=NAVER_SNS_LOGIN_URL+"?"+parameterString;
-
-        return redirectURL;
-    }
 
     @Override
     public ResponseEntity<String> requestAccessToken(String code) {
