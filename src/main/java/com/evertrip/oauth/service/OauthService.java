@@ -129,8 +129,8 @@ public class OauthService {
                 String jwt = tokenProvider.createToken(authentication);
                 String refresh = refreshTokenProvider.createToken(authentication, ipAddress);
 
-                response.addHeader(AUTHORIZATION_HEADER, jwt);
-                response.addHeader(REFRESH_HEADER, refresh);
+                response.addHeader(AUTHORIZATION_HEADER, "Bearer "+jwt);
+                response.addHeader(REFRESH_HEADER, "Bearer "+refresh);
 
                 // REDIS에 Refresh Token 저장
                 try {
